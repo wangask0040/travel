@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <register>http://127.0.0.1:9200/</register>
+  <login>http://127.0.0.1:9201/</login>
+</root>

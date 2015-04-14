@@ -10,6 +10,10 @@ namespace server
     {
         static void Main(string[] args)
         {
+            Config conf = new Config("../../conf/config.xml");
+            RegisterSvr reg = new RegisterSvr();
+            reg.Start(conf.Root["register"].InnerText);
+            Console.ReadLine();
         }
     }
 }
