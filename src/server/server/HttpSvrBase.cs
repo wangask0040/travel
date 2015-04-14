@@ -21,7 +21,7 @@ namespace server
             Get(m_listen);
         }
 
-        public virtual void Proc(HttpListenerRequest req, HttpListenerResponse rsp) { }
+        public virtual void Proc(string recv, HttpListenerResponse rsp) { }
 
         private async void Send(HttpListenerContext cxt)
         {
@@ -29,7 +29,28 @@ namespace server
                 {
                     HttpListenerRequest req = cxt.Request;
                     HttpListenerResponse rsp = cxt.Response;
-                    Proc(req, rsp);
+
+                    if (!req.HasEntityBody)
+                    {
+                        Console.WriteLine("No client data was sent with the request.");
+                        return;
+                    }
+
+                    System.IO.Stream body = req.InputStream;
+                    System.Text.Encoding encoding = req.ContentEncoding;
+                    System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
+
+                    if (req.ContentType != null)
+                    {
+                        Console.WriteLine("Client data content type {0}", req.ContentType);
+                    }
+
+                    string s = reader.ReadToEnd();
+                    Console.WriteLine("recv:{0},lenght:{1}", s, req.ContentLength64);
+                    body.Close();
+                    reader.Close();
+
+                    Proc(s, rsp);
                 });
             await t;
         }

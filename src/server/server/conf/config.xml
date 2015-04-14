@@ -2,4 +2,5 @@
 <root>
   <register>http://127.0.0.1:9200/</register>
   <login>http://127.0.0.1:9201/</login>
+  <accountdb>mongodb://127.0.0.1:27017/account</accountdb>
 </root>

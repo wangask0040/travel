@@ -9,6 +9,8 @@ namespace server
 {
     class Config
     {
+        public const string ConfigFile = "../../conf/config.xml";
+ 
         public XmlElement Root { get { return m_root; } }
 
         public Config(string name)
