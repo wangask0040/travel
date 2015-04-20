@@ -21,7 +21,7 @@ namespace server
             Get(m_listen);
         }
 
-        public virtual void Proc(string recv, HttpListenerResponse rsp) { }
+        public virtual void Proc(HttpListenerRequest req, HttpListenerResponse rsp) { }
 
         private void Send(HttpListenerContext cxt)
         {
@@ -35,6 +35,22 @@ namespace server
                 return;
             }
 
+            Proc(req, rsp);
+        }
+
+        public async void Get(HttpListener lst)
+        {
+            while (true)
+            {
+                var t = lst.GetContextAsync();
+                await t;
+
+                Send(t.Result);
+            }
+        }
+
+        public string GetBody(HttpListenerRequest req)
+        {
             System.IO.Stream body = req.InputStream;
             System.Text.Encoding encoding = req.ContentEncoding;
             System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
@@ -48,19 +64,7 @@ namespace server
             Console.WriteLine("recv:{0},lenght:{1}", s, req.ContentLength64);
             body.Close();
             reader.Close();
-
-            Proc(s, rsp);
-        }
-
-        public async void Get(HttpListener lst)
-        {
-            while (true)
-            {
-                var t = lst.GetContextAsync();
-                await t;
-
-                Send(t.Result);
-            }
+            return s;
         }
 
         private HttpListener m_listen;

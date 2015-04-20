@@ -2,5 +2,7 @@
 <root>
   <register>http://127.0.0.1:9200/</register>
   <login>http://127.0.0.1:9201/</login>
+  <storage>http://127.0.0.1:9202/</storage>
   <accountdb>mongodb://127.0.0.1:27017</accountdb>
+  <weibodb>mongodb://127.0.0.1:27017</weibodb>
 </root>

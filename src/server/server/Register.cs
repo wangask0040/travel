@@ -22,21 +22,22 @@ namespace server
         public string Passwd { get; set; }
     }
 
-    class RegisterSvr : HttpSvrBase
+    class Register : HttpSvrBase
     {
         private MongoClient m_client;
         private IMongoCollection<AccountInfo> m_collection;
 
-        public RegisterSvr()
+        public Register()
         {
             Config c = new Config(Config.ConfigFile);
             m_client = new MongoClient(c.Root["accountdb"].InnerText);
             m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
         }
 
-        public override void Proc(string recv, System.Net.HttpListenerResponse rsp)
+        public override void Proc(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp)
         {
-            asyFunc(recv, rsp);
+            string s = GetBody(req);
+            asyFunc(s, rsp);
         }
 
         private int Check(RegisterReq info)
@@ -47,7 +48,7 @@ namespace server
         private async void asyFunc(string json, System.Net.HttpListenerResponse rsp)
         {
             //先将json串，解析成类
-            RegisterReq reginfo = (RegisterReq)JsonConvert.DeserializeObject(json, typeof(RegisterReq));
+            RegisterReq reginfo = JsonConvert.DeserializeObject<RegisterReq>(json);
 
             //检查账号名，密码是否合法
             Result r = new Result();
@@ -64,7 +65,7 @@ namespace server
                     //写入db
                     var t = m_collection.InsertOneAsync(info);
                     await t;
-                    r.result = 0;
+                    r.result = (int)Result.ResultCode.RC_ok;
                     r.msg = "注册成功！";
                 }
                 catch

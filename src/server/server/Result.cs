@@ -15,6 +15,8 @@ namespace server
         {
             RC_ok = 0,
             RC_account_exists = 1,
+            RC_account_passwd_not_match = 2,
+            RC_failed = 3,
         }
     }
 }

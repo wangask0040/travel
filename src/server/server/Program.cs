@@ -11,8 +11,15 @@ namespace server
         static void Main(string[] args)
         {
             Config conf = new Config(Config.ConfigFile);
-            RegisterSvr reg = new RegisterSvr();
+            Register reg = new Register();
             reg.Start(conf.Root["register"].InnerText);
+
+            Login log = new Login();
+            log.Start(conf.Root["login"].InnerText);
+
+            Storage stg = new Storage();
+            stg.Start(conf.Root["storage"].InnerText);
+
             Console.ReadLine();
         }
     }
