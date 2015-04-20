@@ -23,36 +23,33 @@ namespace server
 
         public virtual void Proc(string recv, HttpListenerResponse rsp) { }
 
-        private async void Send(HttpListenerContext cxt)
+        private void Send(HttpListenerContext cxt)
         {
-            var t = Task.Factory.StartNew(() =>
-                {
-                    HttpListenerRequest req = cxt.Request;
-                    HttpListenerResponse rsp = cxt.Response;
 
-                    if (!req.HasEntityBody)
-                    {
-                        Console.WriteLine("No client data was sent with the request.");
-                        return;
-                    }
+            HttpListenerRequest req = cxt.Request;
+            HttpListenerResponse rsp = cxt.Response;
 
-                    System.IO.Stream body = req.InputStream;
-                    System.Text.Encoding encoding = req.ContentEncoding;
-                    System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
+            if (!req.HasEntityBody)
+            {
+                Console.WriteLine("No client data was sent with the request.");
+                return;
+            }
 
-                    if (req.ContentType != null)
-                    {
-                        Console.WriteLine("Client data content type {0}", req.ContentType);
-                    }
+            System.IO.Stream body = req.InputStream;
+            System.Text.Encoding encoding = req.ContentEncoding;
+            System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
 
-                    string s = reader.ReadToEnd();
-                    Console.WriteLine("recv:{0},lenght:{1}", s, req.ContentLength64);
-                    body.Close();
-                    reader.Close();
+            if (req.ContentType != null)
+            {
+                Console.WriteLine("Client data content type {0}", req.ContentType);
+            }
 
-                    Proc(s, rsp);
-                });
-            await t;
+            string s = reader.ReadToEnd();
+            Console.WriteLine("recv:{0},lenght:{1}", s, req.ContentLength64);
+            body.Close();
+            reader.Close();
+
+            Proc(s, rsp);
         }
 
         public async void Get(HttpListener lst)
