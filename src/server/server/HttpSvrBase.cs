@@ -67,6 +67,19 @@ namespace server
             return s;
         }
 
+        public void Response(System.Net.HttpListenerResponse rsp, string str)
+        {
+            try
+            {
+                byte[] buf = System.Text.Encoding.Default.GetBytes(str);
+                rsp.OutputStream.Write(buf, 0, buf.Length);
+                rsp.OutputStream.Close();
+            }
+            catch
+            {
+            }
+        }
+
         private HttpListener m_listen;
     }
 

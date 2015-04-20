@@ -80,9 +80,7 @@ namespace server
             }
 
             string str = JsonConvert.SerializeObject(r);
-            byte[] buf = System.Text.Encoding.Default.GetBytes(str);
-            rsp.OutputStream.Write(buf, 0, buf.Length);
-            rsp.OutputStream.Close();
+            Response(rsp, str);
         }
     }
 }
