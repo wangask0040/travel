@@ -10,6 +10,8 @@ namespace server
     {
         static void Main(string[] args)
         {
+            ResultMsg.Instance.Init(ResultMsg.ConfigFile);
+
             Config conf = new Config(Config.ConfigFile);
             Register reg = new Register();
             reg.Start(conf.Root["register"].InnerText);

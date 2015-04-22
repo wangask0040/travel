@@ -20,7 +20,7 @@ namespace server
             m_root = m_doc["root"];
         }
 
-        private XmlElement m_root;
-        private XmlDocument m_doc;
+        protected XmlElement m_root;
+        protected XmlDocument m_doc;
     }
 }

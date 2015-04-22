@@ -41,42 +41,31 @@ namespace server
             info._id = req.act;
             info.Passwd = req.pwdmdf;
 
-            var filter = new BsonDocument();
-            filter.Add("_id", info._id);
-            filter.Add("Passwd", req.pwdmdf);
-
             Result r = new Result();
-            var f = m_collection.FindAsync(filter);
-            await f;
 
-            var cursor = f.Result;
-            var c = cursor.MoveNextAsync();
+            //先检查账号是否存在
+            var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
+            CountOptions copt = new CountOptions();
+            copt.Limit = 1;
+            var c = m_collection.CountAsync(findfilter, copt);
             await c;
-
-            var x = c.Result;
-            if (x)
+            if (c.Result == 0)
             {
-                int count = 0;
-                foreach(var doc in cursor.Current)
-                {
-                    count++;
-                }
-
-                if (count == 1)
-                {
-                    r.result = (int)Result.ResultCode.RC_ok;
-                    r.msg = "登录成功！";
-                }
-                else
-                {
-                    r.result = (int)Result.ResultCode.RC_account_passwd_not_match;
-                    r.msg = "账号密码不匹配！";
-                }
+                r.Ret = (int)Result.ResultCode.RC_account_not_exists;
             }
             else
             {
-                r.result = (int)Result.ResultCode.RC_failed;
-                r.msg = "登录失败！";
+                findfilter &= Builders<AccountInfo>.Filter.Eq("Passwd", info.Passwd);
+                var f = m_collection.CountAsync(findfilter, copt);
+                await f;
+                if (f.Result == 0)
+                {
+                    r.Ret = (int)Result.ResultCode.RC_account_passwd_not_match;
+                }
+                else
+                {
+                    r.Ret = (int)Result.ResultCode.RC_ok;
+                }
             }
 
             string str = JsonConvert.SerializeObject(r);

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="gb2312"?>
+<root>
+  <item id="0" msg="操作成功！"></item>
+  <item id="1" msg="账号已存在！"></item>
+  <item id="2" msg="账号密码不匹配！"></item>
+  <item id="3" msg="操作失败！"></item>
+  <item id="4" msg="账号不存在！"></item>
+</root>

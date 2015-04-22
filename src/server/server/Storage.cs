@@ -71,14 +71,12 @@ namespace server
             {
                 var t = m_collection.InsertOneAsync(info);
                 await t;
-                r.result = (int)Result.ResultCode.RC_ok;
-                r.msg = "发送成功！";
+                r.Ret = (int)Result.ResultCode.RC_ok;
 
             }
             catch
             {
-                r.result = (int)Result.ResultCode.RC_failed;
-                r.msg = "发送失败！";
+                r.Ret = (int)Result.ResultCode.RC_failed;
             }
 
             string json = JsonConvert.SerializeObject(r);

@@ -19,7 +19,14 @@ namespace server
     class AccountInfo
     {
         public string _id { get; set; }
+        public long AccountId { get; set; }
         public string Passwd { get; set; }
+    }
+
+    class AccountId
+    {
+        public string _id { get; set; }
+        public string count { get; set; }
     }
 
     class Register : HttpSvrBase
@@ -27,11 +34,17 @@ namespace server
         private MongoClient m_client;
         private IMongoCollection<AccountInfo> m_collection;
 
+        private MongoClient m_accountIdClient;
+        private IMongoCollection<BsonDocument> m_accountidCollection;
+
         public Register()
         {
             Config c = new Config(Config.ConfigFile);
             m_client = new MongoClient(c.Root["accountdb"].InnerText);
             m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
+
+            m_accountIdClient = new MongoClient(c.Root["accountid"].InnerText);
+            m_accountidCollection = m_accountIdClient.GetDatabase("db").GetCollection<BsonDocument>("count");
         }
 
         public override void Proc(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp)
@@ -61,26 +74,54 @@ namespace server
                 info.Passwd = reginfo.pwdmdf;
 
                 try
-                { 
-                    //写入db
-                    var t = m_collection.InsertOneAsync(info);
-                    await t;
-                    r.result = (int)Result.ResultCode.RC_ok;
-                    r.msg = "注册成功！";
+                {
+                    //                 BsonDocument inc = new BsonDocument();
+                    //                 inc.Add("count", 1);
+                    //                 BsonDocument doc = new BsonDocument();
+                    //                 doc.Add("$inc", inc);
+                    //                 UpdateOptions up = new UpdateOptions();
+                    //                 up.IsUpsert = true;
+                    //                 var u = m_accountidCollection.UpdateOneAsync(filter, doc, up);
+
+                    //先判断账号是否存在
+                    var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
+                    CountOptions copt = new CountOptions();
+                    copt.Limit = 1;
+                    var f = m_collection.CountAsync(findfilter, copt);
+                    await f;
+                    if (f.Result > 0)
+                    {
+                        r.Ret = (int)Result.ResultCode.RC_account_exists;
+                    }
+                    else
+                    {
+                        //把账号id加1
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", "AccountCount");
+                        var updefine = Builders<BsonDocument>.Update.Inc("count", 1);
+                        var u = m_accountidCollection.FindOneAndUpdateAsync(filter, updefine);
+                        await u;
+
+                        BsonDocument retDoc = (BsonDocument)u.Result;
+                        info.AccountId = retDoc["count"].ToInt64();
+
+                        //写入db
+                        var t = m_collection.InsertOneAsync(info);
+                        await t;
+
+                        r.Ret = (int)Result.ResultCode.RC_ok;
+                    }
                 }
                 catch
                 {
                     //发生异常
-                    r.result = (int)Result.ResultCode.RC_account_exists;
-                    r.msg = "账号已存在！";
+                    r.Ret = (int)Result.ResultCode.RC_account_exists;
                 }
                 
             }
             else
             {
                 //账号合法性检查
-                r.result = ret;
-                r.msg = "注册失败！";
+                r.Ret = ret;
             }
 
             //回包
