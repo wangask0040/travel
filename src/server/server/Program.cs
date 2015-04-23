@@ -22,6 +22,9 @@ namespace server
             Storage stg = new Storage();
             stg.Start(conf.Root["storage"].InnerText);
 
+            Query qry = new Query();
+            qry.Start(conf.Root["query"].InnerText);
+
             Console.ReadLine();
         }
     }

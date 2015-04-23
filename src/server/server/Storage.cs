@@ -26,7 +26,7 @@ namespace server
         public string[] photo { get; set; }
         public double longi { get; set; }
         public double lati { get; set; }
-        public string account { get; set; }
+        public long AccountId { get; set; }
         public string address { get; set; }
         public string weather { get; set; }
     }
@@ -42,7 +42,7 @@ namespace server
         public string content { get; set; }
         public string[] photo { get; set; }
         public Geom geom { get; set; }
-        public string account { get; set; }
+        public long AccountId { get; set; }
         public string address { get; set; }
         public string weather { get; set; }
         public DateTime time { get; set; }
@@ -50,7 +50,7 @@ namespace server
         {
             content = info.content;
             photo = info.photo;
-            account = info.account;
+            AccountId = info.AccountId;
             address = info.address;
             weather = info.weather;
             geom = new Geom();
@@ -92,7 +92,7 @@ namespace server
 
                 //查找
                 var filter = Builders<BsonDocument>.Filter.Eq("time", info.time)
-                    & Builders<BsonDocument>.Filter.Eq("account", info.account);
+                    & Builders<BsonDocument>.Filter.Eq("AccountId", info.AccountId);
 
                 var fopt = new FindOptions<BsonDocument>();
                 fopt.Limit = 1;
