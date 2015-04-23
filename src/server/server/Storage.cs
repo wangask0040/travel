@@ -31,6 +31,12 @@ namespace server
         public string weather { get; set; }
     }
 
+    class SendWeiboRsp : Result
+    {
+        public ObjectId _id { get; set; }
+        public DateTime time { get; set; }
+    }
+
     class WeiboInfo
     {
         public string content { get; set; }
@@ -39,6 +45,7 @@ namespace server
         public string account { get; set; }
         public string address { get; set; }
         public string weather { get; set; }
+        public DateTime time { get; set; }
         public void FillData(SendWeiboReq info)
         {
             content = info.content;
@@ -48,6 +55,10 @@ namespace server
             weather = info.weather;
             geom = new Geom();
             geom.FillData(info.longi, info.lati);
+            time = new DateTime();
+            TimeSpan ts = new TimeSpan(8, 0, 0);
+            time = DateTime.Now + ts;
+
         }
     }
 
@@ -56,23 +67,55 @@ namespace server
         private MongoClient m_client;
         private IMongoCollection<WeiboInfo> m_collection;
 
+        private MongoClient m_findClient;
+        private IMongoCollection<BsonDocument> m_findCollection;
+
         public Storage()
         {
             Config c = new Config(Config.ConfigFile);
             m_client = new MongoClient(c.Root["weibodb"].InnerText);
             m_collection = m_client.GetDatabase("db").GetCollection<WeiboInfo>("weibo");
+
+            m_findClient = new MongoClient(c.Root["weibodb"].InnerText);
+            m_findCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("weibo");
         }
 
         public async void SaveWeibo(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp, WeiboInfo info)
         {
-            Result r = new Result();
+            SendWeiboRsp r = new SendWeiboRsp();
 
             try
             {
+                //插入一条
                 var t = m_collection.InsertOneAsync(info);
                 await t;
-                r.Ret = (int)Result.ResultCode.RC_ok;
 
+                //查找
+                var filter = Builders<BsonDocument>.Filter.Eq("time", info.time)
+                    & Builders<BsonDocument>.Filter.Eq("account", info.account);
+
+                var fopt = new FindOptions<BsonDocument>();
+                fopt.Limit = 1;
+
+                var f = m_findCollection.FindAsync(filter, fopt);
+                
+                using (var cursor = await f)
+                {
+                    while (await cursor.MoveNextAsync())
+                    {
+                        var batch = cursor.Current;
+                        foreach (var document in batch)
+                        {
+                            r._id = new ObjectId();
+                            r._id = document["_id"].AsObjectId;
+                            r.time = document["time"].ToUniversalTime();
+                            break;
+                        }
+                        break;
+                    }
+                }
+
+                r.Ret = (int)Result.ResultCode.RC_ok;
             }
             catch
             {
