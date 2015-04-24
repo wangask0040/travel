@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
+using System.Net;
 
 namespace server
 {
@@ -39,7 +40,7 @@ namespace server
             m_findCollection = m_client.GetDatabase("db").GetCollection<WeiboInfoTotal>("weibo");
         }
 
-        public override void Proc(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp)
+        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             switch (req.RawUrl)
             {
@@ -52,7 +53,7 @@ namespace server
 
         }
 
-        private async void asyQueryJustlt(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp)
+        private async void asyQueryJustlt(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             QueryRsp r = new QueryRsp();
 

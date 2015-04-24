@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Net;
 
 namespace server
 {
@@ -27,13 +28,13 @@ namespace server
             m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
         }
 
-        public override void Proc(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp)
+        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             string s = GetBody(req);
             asyncFunc(s, rsp);
         }
 
-        private async void asyncFunc(string json, System.Net.HttpListenerResponse rsp)
+        private async void asyncFunc(string json, HttpListenerResponse rsp)
         {
             LoginReq req = JsonConvert.DeserializeObject<LoginReq>(json);
 

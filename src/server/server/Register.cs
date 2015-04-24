@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.Net;
 
 namespace server
 {
@@ -47,7 +48,7 @@ namespace server
             m_accountidCollection = m_accountIdClient.GetDatabase("db").GetCollection<BsonDocument>("count");
         }
 
-        public override void Proc(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse rsp)
+        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             string s = GetBody(req);
             asyFunc(s, rsp);
@@ -58,7 +59,7 @@ namespace server
             return 0;
         }
 
-        private async void asyFunc(string json, System.Net.HttpListenerResponse rsp)
+        private async void asyFunc(string json, HttpListenerResponse rsp)
         {
             //先将json串，解析成类
             RegisterReq reginfo = JsonConvert.DeserializeObject<RegisterReq>(json);

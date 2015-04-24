@@ -67,10 +67,11 @@ namespace server
             return s;
         }
 
-        public void Response(System.Net.HttpListenerResponse rsp, string str)
+        public void Response(HttpListenerResponse rsp, string str)
         {
             try
             {
+                rsp.ContentType = "application/json";
                 byte[] buf = System.Text.Encoding.Default.GetBytes(str);
                 rsp.OutputStream.Write(buf, 0, buf.Length);
                 rsp.OutputStream.Close();
