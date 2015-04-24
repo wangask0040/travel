@@ -57,7 +57,7 @@ namespace server
             QueryRsp r = new QueryRsp();
 
             QueryReq qr = JsonConvert.DeserializeObject<QueryReq>(GetBody(req));
-            var filter = Builders<WeiboInfoTotal>.Filter.Near("geom.coordinates", qr.longi, qr.lati);
+            var filter = Builders<WeiboInfoTotal>.Filter.Near("coordinates", qr.longi, qr.lati);
             var fopt = new FindOptions<WeiboInfoTotal>();
             fopt.Limit = 3;
             fopt.Sort = Builders<WeiboInfoTotal>.Sort.Descending("time");

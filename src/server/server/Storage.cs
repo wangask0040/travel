@@ -9,17 +9,6 @@ using MongoDB.Bson;
 
 namespace server
 {
-    class Geom
-    {
-        public string type { get; set; }
-        public double[] coordinates { get; set; }
-        public void FillData(double longi, double lati)
-        {
-            type = "Point";
-            coordinates = new double[] { longi, lati };
-        }
-    }
-
     class SendWeiboReq
     {
         public string content { get; set; }
@@ -41,11 +30,11 @@ namespace server
     {
         public string content { get; set; }
         public string[] photo { get; set; }
-        public Geom geom { get; set; }
         public long AccountId { get; set; }
         public string address { get; set; }
         public string weather { get; set; }
         public DateTime time { get; set; }
+        public double[] coordinates { get; set; }
         public void FillData(SendWeiboReq info)
         {
             content = info.content;
@@ -53,11 +42,10 @@ namespace server
             AccountId = info.AccountId;
             address = info.address;
             weather = info.weather;
-            geom = new Geom();
-            geom.FillData(info.longi, info.lati);
             time = new DateTime();
             TimeSpan ts = new TimeSpan(8, 0, 0);
             time = DateTime.Now + ts;
+            coordinates = new double[] { info.longi, info.lati };
 
         }
     }
