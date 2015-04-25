@@ -11,21 +11,11 @@ using System.Net;
 
 namespace server
 {
-    class QueryReq
-    {
-        public double longi { get; set; }
-        public double lati { get; set; }
-    }
-
     class WeiboInfoTotal : WeiboInfo
     {
         public ObjectId _id { get; set; }
-
-    }
-
-    class QueryRsp : Result
-    {
-        public List<WeiboInfoTotal> info = new List<WeiboInfoTotal>();
+        public int ZanCount { get; set; }
+        public int PingLunCount { get; set; }
     }
 
     class Query : HttpSvrBase

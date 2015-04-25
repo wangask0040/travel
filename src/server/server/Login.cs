@@ -12,12 +12,6 @@ namespace server
 {
     class Login : HttpSvrBase
     {
-        class LoginReq
-        {
-            public string act { get; set; }
-            public string pwdmdf { get; set; }
-        }
-
         private MongoClient m_client;
         private IMongoCollection<AccountInfo> m_collection;
 

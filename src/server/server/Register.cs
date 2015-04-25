@@ -10,13 +10,6 @@ using System.Net;
 
 namespace server
 {
-    class RegisterReq
-    {
-        public string act { get; set; }
-        public string pwd { get; set; }
-        public string pwdmdf { get; set; }
-    }
-
     class AccountInfo
     {
         public string _id { get; set; }

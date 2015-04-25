@@ -10,23 +10,6 @@ using System.Net;
 
 namespace server
 {
-    class SendWeiboReq
-    {
-        public string content { get; set; }
-        public string[] photo { get; set; }
-        public double longi { get; set; }
-        public double lati { get; set; }
-        public long AccountId { get; set; }
-        public string address { get; set; }
-        public string weather { get; set; }
-    }
-
-    class SendWeiboRsp : Result
-    {
-        public ObjectId _id { get; set; }
-        public DateTime time { get; set; }
-    }
-
     class WeiboInfo
     {
         public string content { get; set; }
@@ -47,7 +30,6 @@ namespace server
             TimeSpan ts = new TimeSpan(8, 0, 0);
             time = DateTime.Now + ts;
             coordinates = new double[] { info.longi, info.lati };
-
         }
     }
 
@@ -67,18 +49,6 @@ namespace server
         }
     }
 
-
-    class ZanWeiboReq
-    {
-        public string _id { get; set; }
-        public long AccountId { get; set; }
-    }
-
-    class PLWeiboReq : ZanWeiboReq
-    {
-        public string content { get; set; }
-    }
-
     class Storage : HttpSvrBase
     {
         private MongoClient m_client;
@@ -86,6 +56,7 @@ namespace server
         private IMongoCollection<BsonDocument> m_findCollection;
         private IMongoCollection<BsonDocument> m_zanCollection;
         private IMongoCollection<BsonDocument> m_pinglunCollection;
+        
 
         public Storage()
         {
@@ -93,6 +64,7 @@ namespace server
             m_client = new MongoClient(c.Root["weibodb"].InnerText);
             m_collection = m_client.GetDatabase("db").GetCollection<WeiboInfo>("weibo");
             m_findCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("weibo");
+
             m_zanCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("zandb");
             m_pinglunCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("pinglundb");
         }
@@ -193,7 +165,7 @@ namespace server
 
                 //更新评论数
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", objid);
-                var up = Builders<BsonDocument>.Update.Inc("PingLuCount", 1);
+                var up = Builders<BsonDocument>.Update.Inc("PingLunCount", 1);
                 var u = m_findCollection.UpdateOneAsync(filter, up);
                 await u;
 
