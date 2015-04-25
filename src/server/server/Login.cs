@@ -18,7 +18,7 @@ namespace server
         public Login()
         {
             Config c = new Config(Config.ConfigFile);
-            m_client = new MongoClient(c.Root["accountdb"].InnerText);
+            m_client = new MongoClient(c.Root["weibodb"].InnerText);
             m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
         }
 
@@ -33,8 +33,8 @@ namespace server
             LoginReq req = JsonConvert.DeserializeObject<LoginReq>(json);
 
             AccountInfo info = new AccountInfo();
-            info._id = req.act;
-            info.Passwd = req.pwdmdf;
+            info._id = req.account;
+            info.Passwd = req.passwdkey;
 
             Result r = new Result();
 

@@ -27,18 +27,14 @@ namespace server
     {
         private MongoClient m_client;
         private IMongoCollection<AccountInfo> m_collection;
-
-        private MongoClient m_accountIdClient;
         private IMongoCollection<BsonDocument> m_accountidCollection;
 
         public Register()
         {
             Config c = new Config(Config.ConfigFile);
-            m_client = new MongoClient(c.Root["accountdb"].InnerText);
+            m_client = new MongoClient(c.Root["weibodb"].InnerText);
             m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
-
-            m_accountIdClient = new MongoClient(c.Root["accountid"].InnerText);
-            m_accountidCollection = m_accountIdClient.GetDatabase("db").GetCollection<BsonDocument>("count");
+            m_accountidCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("count");
         }
 
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
@@ -64,19 +60,11 @@ namespace server
             {
                 //账号的数据结构
                 AccountInfo info = new AccountInfo();
-                info._id = reginfo.act;
-                info.Passwd = reginfo.pwdmdf;
+                info._id = reginfo.account;
+                info.Passwd = reginfo.passwdkey;
 
                 try
                 {
-                    //                 BsonDocument inc = new BsonDocument();
-                    //                 inc.Add("count", 1);
-                    //                 BsonDocument doc = new BsonDocument();
-                    //                 doc.Add("$inc", inc);
-                    //                 UpdateOptions up = new UpdateOptions();
-                    //                 up.IsUpsert = true;
-                    //                 var u = m_accountidCollection.UpdateOneAsync(filter, doc, up);
-
                     //先判断账号是否存在
                     var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
                     CountOptions copt = new CountOptions();
@@ -110,7 +98,6 @@ namespace server
                     //发生异常
                     r.Ret = (int)Result.ResultCode.RC_account_exists;
                 }
-                
             }
             else
             {

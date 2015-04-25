@@ -49,6 +49,16 @@ namespace server
         }
     }
 
+    class UserInfo
+    {
+        public long _id { get; set; }
+        public string icon { get; set; }
+        public string name { get; set; }
+        public long[] follow { get; set; }
+        public long[] fans { get; set; }
+    }
+
+
     class Storage : HttpSvrBase
     {
         private MongoClient m_client;
@@ -56,7 +66,7 @@ namespace server
         private IMongoCollection<BsonDocument> m_findCollection;
         private IMongoCollection<BsonDocument> m_zanCollection;
         private IMongoCollection<BsonDocument> m_pinglunCollection;
-        
+        private IMongoCollection<UserInfo> m_userinfoCollection;
 
         public Storage()
         {
@@ -65,8 +75,9 @@ namespace server
             m_collection = m_client.GetDatabase("db").GetCollection<WeiboInfo>("weibo");
             m_findCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("weibo");
 
-            m_zanCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("zandb");
-            m_pinglunCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("pinglundb");
+            m_zanCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("zan");
+            m_pinglunCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("pinglun");
+            m_userinfoCollection = m_client.GetDatabase("db").GetCollection<UserInfo>("userinfo");
         }
 
         public async void SaveWeibo(HttpListenerRequest req, HttpListenerResponse rsp, WeiboInfo info)
@@ -80,8 +91,8 @@ namespace server
                 await t;
 
                 //查找
-                var filter = Builders<BsonDocument>.Filter.Eq("time", info.time)
-                    & Builders<BsonDocument>.Filter.Eq("AccountId", info.AccountId);
+                var filter = (Builders<BsonDocument>.Filter.Eq("time", info.time)
+                    & Builders<BsonDocument>.Filter.Eq("AccountId", info.AccountId));
 
                 var fopt = new FindOptions<BsonDocument>();
                 fopt.Limit = 1;
@@ -179,6 +190,35 @@ namespace server
             Response(rsp, json);
         }
 
+        private async  void Follow(HttpListenerRequest req, HttpListenerResponse rsp, FollowReq info)
+        {
+            Result r = new Result();
+
+            var filter = Builders<UserInfo>.Filter.Eq("_id", info.startId);
+            var up = Builders<UserInfo>.Update.AddToSet("follow", info.followId);
+            var uop = new UpdateOptions();
+            uop.IsUpsert = true;
+
+            try
+            {
+                var t = m_userinfoCollection.UpdateOneAsync(filter, up, uop);
+                await t;
+
+                filter = Builders<UserInfo>.Filter.Eq("_id", info.followId);
+                up = Builders<UserInfo>.Update.AddToSet("follow", info.startId);
+                t = m_userinfoCollection.UpdateOneAsync(filter, up, uop);
+                await t;
+
+                r.Ret = (int)Result.ResultCode.RC_ok;
+            }
+            catch
+            {
+                r.Ret = (int)Result.ResultCode.RC_failed;
+            }
+            string json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             switch (req.RawUrl)
@@ -204,6 +244,13 @@ namespace server
                         string s = GetBody(req);
                         PLWeiboReq info = JsonConvert.DeserializeObject<PLWeiboReq>(s);
                         PingLunWeibo(req, rsp, info);
+                    }
+                    break;
+                case "/follow":
+                    {
+                        string s = GetBody(req);
+                        FollowReq info = JsonConvert.DeserializeObject<FollowReq>(s);
+                        Follow(req, rsp, info);
                     }
                     break;
                 default:

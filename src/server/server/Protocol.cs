@@ -9,15 +9,14 @@ namespace server
 {
     class LoginReq
     {
-        public string act { get; set; }
-        public string pwdmdf { get; set; }
+        public string account { get; set; }
+        public string passwdkey { get; set; }
     }
 
     class RegisterReq
     {
-        public string act { get; set; }
-        public string pwd { get; set; }
-        public string pwdmdf { get; set; }
+        public string account { get; set; }
+        public string passwdkey { get; set; }
     }
 
     class SendWeiboReq
@@ -48,15 +47,29 @@ namespace server
         public DateTime time { get; set; }
     }
 
-    class QueryReq
+    class LocationQueryReq
     {
         public double longi { get; set; }
         public double lati { get; set; }
     }
 
-    class QueryRsp : Result
+    class LocationQueryRsp : Result
     {
         public List<WeiboInfoTotal> info = new List<WeiboInfoTotal>();
     }
+
+    class FollowReq
+    {
+        public long startId { get; set; }
+        public long followId { get; set; }
+    }
+
+    class FriendQueryReq
+    {
+        public long AccountId { get; set; }
+    }
+
+    class FriendQueryRsp : LocationQueryRsp
+    { }
 
 }
