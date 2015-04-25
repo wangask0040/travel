@@ -13,6 +13,11 @@ namespace server
         public string passwdkey { get; set; }
     }
 
+    class LoginRsp : Result
+    {
+        public long AccountId { get; set; }
+    }
+
     class RegisterReq
     {
         public string account { get; set; }

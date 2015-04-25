@@ -36,7 +36,7 @@ namespace server
             info._id = req.account;
             info.Passwd = req.passwdkey;
 
-            Result r = new Result();
+            LoginRsp r = new LoginRsp();
 
             //先检查账号是否存在
             var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
@@ -51,15 +51,28 @@ namespace server
             else
             {
                 findfilter &= Builders<AccountInfo>.Filter.Eq("Passwd", info.Passwd);
-                var f = m_collection.CountAsync(findfilter, copt);
-                await f;
-                if (f.Result == 0)
+                var f = m_collection.FindAsync(findfilter);
+                using (var cs = await f)
                 {
-                    r.Ret = (int)Result.ResultCode.RC_account_passwd_not_match;
-                }
-                else
-                {
-                    r.Ret = (int)Result.ResultCode.RC_ok;
+
+                    if (await cs.MoveNextAsync())
+                    {
+                        var bat = cs.Current;
+                        var it = bat.GetEnumerator();
+                        if (it.MoveNext())
+                        {
+                            r.Ret = (int)Result.ResultCode.RC_ok;
+                            r.AccountId = it.Current.AccountId;
+                        }
+                        else
+                        {
+                            r.Ret = (int)Result.ResultCode.RC_account_passwd_not_match;
+                        }
+                    }
+                    else
+                    {
+                        r.Ret = (int)Result.ResultCode.RC_account_passwd_not_match;
+                    }
                 }
             }
 
