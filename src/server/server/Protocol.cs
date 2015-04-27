@@ -35,20 +35,20 @@ namespace server
         public string weather { get; set; }
     }
 
-    class ZanWeiboReq
+    class LikeWeiboReq
     {
         public string _id { get; set; }
         public long AccountId { get; set; }
     }
 
-    class PLWeiboReq : ZanWeiboReq
+    class CommentWeiboReq : LikeWeiboReq
     {
         public string content { get; set; }
     }
 
     class SendWeiboRsp : Result
     {
-        public ObjectId _id { get; set; }
+        public string _id { get; set; }
         public DateTime time { get; set; }
     }
 
@@ -81,5 +81,14 @@ namespace server
     class FriendQueryRsp : LocationQueryRsp
     { }
 
+    class CommentQueryReq
+    {
+        public string _id { get; set; }
+        public int skip { get; set; }
+    }
 
+    class CommentQueryRsp : Result
+    {
+        public List<CommentUnit> info = new List<CommentUnit>();
+    }
 }

@@ -14,25 +14,14 @@ namespace server
     class WeiboInfoTotal : WeiboInfo
     {
         public ObjectId _id { get; set; }
-        public int ZanCount { get; set; }
-        public int PingLunCount { get; set; }
+        public int LikeCount { get; set; }
+        public int CommentCount { get; set; }
     }
 
     class Query : HttpSvrBase
     {
-        private IMongoClient m_client;
-        private IMongoCollection<WeiboInfoTotal> m_findCollection;
-        private IMongoCollection<UserInfo> m_userinfoCollection;
         private readonly int limit = 3;
         private readonly int notLimit = 5;
-
-        public Query()
-        {
-            Config c = new Config(Config.ConfigFile);
-            m_client = new MongoClient(c.Root["weibodb"].InnerText);
-            m_findCollection = m_client.GetDatabase("db").GetCollection<WeiboInfoTotal>("weibo");
-            m_userinfoCollection = m_client.GetDatabase("db").GetCollection<UserInfo>("userinfo");
-        }
 
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
@@ -52,10 +41,56 @@ namespace server
                         QueryFriend(req, rsp, info);
                     }
                     break;
+                case "/comment":
+                    {
+                        string s = GetBody(req);
+                        CommentQueryReq info = JsonConvert.DeserializeObject<CommentQueryReq>(s);
+                        QueryComment(req, rsp, info);
+                    }
+                    break;
                 default:
                     break;
             }
 
+        }
+
+        private async void QueryComment(HttpListenerRequest req, HttpListenerResponse rsp, CommentQueryReq info)
+        {
+            CommentQueryRsp r = new CommentQueryRsp();
+
+            var filter = Builders<CommentInfo>.Filter.Eq("_id", new ObjectId(info._id));
+            var opt = new FindOptions<CommentInfo>();
+            opt.Projection = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.skip * notLimit), notLimit);
+            var f = CollectionMgr.Instance.CommentInfo.FindAsync(filter, opt);
+
+            try
+            {
+                using (var cursor = await f)
+                {
+                    while (await cursor.MoveNextAsync())
+                    {
+                        var batch = cursor.Current;
+                        foreach (var document in batch)
+                        {
+                            foreach (var arr in document.ContentArray)
+                            {
+                                r.info.Add(arr);
+                            }
+
+                            r.Ret = (int)Result.ResultCode.RC_ok;
+                            break;
+                        }
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                r.Ret = (int)Result.ResultCode.RC_failed;
+            }
+
+            string json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
         }
 
         private async void QueryFriend(HttpListenerRequest req, HttpListenerResponse rsp, FriendQueryReq info)
@@ -68,7 +103,7 @@ namespace server
 
             try
             {
-                var f = m_userinfoCollection.FindAsync(filter, opt);
+                var f = CollectionMgr.Instance.UserInfo.FindAsync(filter, opt);
                 using (var cursor = await f)
                 {
                     while (await cursor.MoveNextAsync())
@@ -83,7 +118,7 @@ namespace server
                                 uopt.Limit = (info.preview ? limit : notLimit);
                                 uopt.Skip = (info.skip * uopt.Limit);
 
-                                var u = m_findCollection.FindAsync(ufilter, uopt);
+                                var u = CollectionMgr.Instance.WeiboTotal.FindAsync(ufilter, uopt);
                                 using (var cs = await u)
                                 {
                                     while (await cs.MoveNextAsync())
@@ -128,7 +163,7 @@ namespace server
 
             try
             {
-                var f = m_findCollection.FindAsync(filter, fopt);
+                var f = CollectionMgr.Instance.WeiboTotal.FindAsync(filter, fopt);
 
                 using (var cursor = await f)
                 {

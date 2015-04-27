@@ -12,6 +12,8 @@ namespace server
         {
             ResultMsg.Instance.Init(ResultMsg.ConfigFile);
 
+            CollectionMgr.Instance.Init();
+
             Config conf = new Config(Config.ConfigFile);
             Register reg = new Register();
             reg.Start(conf.Root["register"].InnerText);

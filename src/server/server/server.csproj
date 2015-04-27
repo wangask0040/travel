@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionMgr.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="HttpSvrBase.cs" />
     <Compile Include="Login.cs" />

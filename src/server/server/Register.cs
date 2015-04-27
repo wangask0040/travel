@@ -25,18 +25,6 @@ namespace server
 
     class Register : HttpSvrBase
     {
-        private MongoClient m_client;
-        private IMongoCollection<AccountInfo> m_collection;
-        private IMongoCollection<BsonDocument> m_accountidCollection;
-
-        public Register()
-        {
-            Config c = new Config(Config.ConfigFile);
-            m_client = new MongoClient(c.Root["weibodb"].InnerText);
-            m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
-            m_accountidCollection = m_client.GetDatabase("db").GetCollection<BsonDocument>("count");
-        }
-
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             string s = GetBody(req);
@@ -69,7 +57,7 @@ namespace server
                     var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
                     CountOptions copt = new CountOptions();
                     copt.Limit = 1;
-                    var f = m_collection.CountAsync(findfilter, copt);
+                    var f = CollectionMgr.Instance.AccountInfo.CountAsync(findfilter, copt);
                     await f;
                     if (f.Result > 0)
                     {
@@ -80,14 +68,14 @@ namespace server
                         //把账号id加1
                         var filter = Builders<BsonDocument>.Filter.Eq("_id", "AccountCount");
                         var updefine = Builders<BsonDocument>.Update.Inc("count", 1);
-                        var u = m_accountidCollection.FindOneAndUpdateAsync(filter, updefine);
+                        var u = CollectionMgr.Instance.CountBson.FindOneAndUpdateAsync(filter, updefine);
                         await u;
 
                         BsonDocument retDoc = (BsonDocument)u.Result;
                         info.AccountId = retDoc["count"].ToInt64();
 
                         //写入db
-                        var t = m_collection.InsertOneAsync(info);
+                        var t = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
                         await t;
 
                         r.Ret = (int)Result.ResultCode.RC_ok;

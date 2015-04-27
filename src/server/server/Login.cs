@@ -12,16 +12,6 @@ namespace server
 {
     class Login : HttpSvrBase
     {
-        private MongoClient m_client;
-        private IMongoCollection<AccountInfo> m_collection;
-
-        public Login()
-        {
-            Config c = new Config(Config.ConfigFile);
-            m_client = new MongoClient(c.Root["weibodb"].InnerText);
-            m_collection = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
-        }
-
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             string s = GetBody(req);
@@ -42,7 +32,7 @@ namespace server
             var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
             CountOptions copt = new CountOptions();
             copt.Limit = 1;
-            var c = m_collection.CountAsync(findfilter, copt);
+            var c = CollectionMgr.Instance.AccountInfo.CountAsync(findfilter, copt);
             await c;
             if (c.Result == 0)
             {
@@ -51,7 +41,7 @@ namespace server
             else
             {
                 findfilter &= Builders<AccountInfo>.Filter.Eq("Passwd", info.Passwd);
-                var f = m_collection.FindAsync(findfilter);
+                var f = CollectionMgr.Instance.AccountInfo.FindAsync(findfilter);
                 using (var cs = await f)
                 {
 

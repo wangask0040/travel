@@ -22,7 +22,7 @@ namespace server
             RC_account_passwd_not_match = 2,
             RC_failed = 3,
             RC_account_not_exists = 4,
-            RC_alreay_zan = 5,
+            RC_alreay_like = 5,
         }
     }
 
