@@ -23,6 +23,8 @@ namespace server
         private IMongoClient m_client;
         private IMongoCollection<WeiboInfoTotal> m_findCollection;
         private IMongoCollection<UserInfo> m_userinfoCollection;
+        private readonly int limit = 3;
+        private readonly int notLimit = 5;
 
         public Query()
         {
@@ -37,13 +39,17 @@ namespace server
             switch (req.RawUrl)
             {
                 case "/location":
-                    asyQueryLocation(req, rsp);
+                    {
+                        string s = GetBody(req);
+                        LocationQueryReq info = JsonConvert.DeserializeObject<LocationQueryReq>(s);
+                        QueryLocation(req, rsp, info);
+                    }
                     break;
                 case "/friend":
                     {
                         string s = GetBody(req);
                         FriendQueryReq info = JsonConvert.DeserializeObject<FriendQueryReq>(s);
-                        asyQueryFriend(req, rsp, info);
+                        QueryFriend(req, rsp, info);
                     }
                     break;
                 default:
@@ -52,7 +58,7 @@ namespace server
 
         }
 
-        private async void asyQueryFriend(HttpListenerRequest req, HttpListenerResponse rsp, FriendQueryReq info)
+        private async void QueryFriend(HttpListenerRequest req, HttpListenerResponse rsp, FriendQueryReq info)
         {
             FriendQueryRsp r = new FriendQueryRsp();
 
@@ -74,7 +80,8 @@ namespace server
                             {
                                 var ufilter = Builders<WeiboInfoTotal>.Filter.In("AccountId", document.follow.AsEnumerable());
                                 var uopt = new FindOptions<WeiboInfoTotal>();
-                                uopt.Limit = 3;
+                                uopt.Limit = (info.preview ? limit : notLimit);
+                                uopt.Skip = (info.skip * uopt.Limit);
 
                                 var u = m_findCollection.FindAsync(ufilter, uopt);
                                 using (var cs = await u)
@@ -109,15 +116,15 @@ namespace server
             Response(rsp, json);
         }
 
-        private async void asyQueryLocation(HttpListenerRequest req, HttpListenerResponse rsp)
+        private async void QueryLocation(HttpListenerRequest req, HttpListenerResponse rsp, LocationQueryReq info)
         {
             LocationQueryRsp r = new LocationQueryRsp();
 
-            LocationQueryReq qr = JsonConvert.DeserializeObject<LocationQueryReq>(GetBody(req));
-            var filter = Builders<WeiboInfoTotal>.Filter.Near("coordinates", qr.longi, qr.lati);
+            var filter = Builders<WeiboInfoTotal>.Filter.Near("coordinates", info.longi, info.lati);
             var fopt = new FindOptions<WeiboInfoTotal>();
-            fopt.Limit = 3;
+            fopt.Limit = (info.preview ? limit : notLimit);
             fopt.Sort = Builders<WeiboInfoTotal>.Sort.Descending("time");
+            fopt.Skip = (info.skip * fopt.Limit);
 
             try
             {

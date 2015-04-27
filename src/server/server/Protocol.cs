@@ -56,6 +56,8 @@ namespace server
     {
         public double longi { get; set; }
         public double lati { get; set; }
+        public int skip { get; set; }
+        public bool preview { get; set; }
     }
 
     class LocationQueryRsp : Result
@@ -72,9 +74,12 @@ namespace server
     class FriendQueryReq
     {
         public long AccountId { get; set; }
+        public int skip { get; set; }
+        public bool preview { get; set; }
     }
 
     class FriendQueryRsp : LocationQueryRsp
     { }
+
 
 }
