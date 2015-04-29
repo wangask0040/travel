@@ -17,11 +17,6 @@ namespace server
         public string Passwd { get; set; }
     }
 
-    class AccountId
-    {
-        public string _id { get; set; }
-        public string count { get; set; }
-    }
 
     class Register : HttpSvrBase
     {
@@ -65,18 +60,42 @@ namespace server
                     }
                     else
                     {
-                        //把账号id加1
+                        //先判断有没有
+                        var countopt = new CountOptions();
+                        countopt.Limit = 1;
                         var filter = Builders<BsonDocument>.Filter.Eq("_id", "AccountCount");
-                        var updefine = Builders<BsonDocument>.Update.Inc("count", 1);
-                        var u = CollectionMgr.Instance.CountBson.FindOneAndUpdateAsync(filter, updefine);
-                        await u;
+                        var c = CollectionMgr.Instance.CountBson.CountAsync(filter, countopt);
+                        await c;
 
-                        BsonDocument retDoc = (BsonDocument)u.Result;
-                        info.AccountId = retDoc["count"].ToInt64();
+                        if (c.Result > 0)
+                        {
+                            //把账号id加1
+                            var updefine = Builders<BsonDocument>.Update.Inc("count", 1);
+                            var u = CollectionMgr.Instance.CountBson.FindOneAndUpdateAsync(filter, updefine);
+                            await u;
 
-                        //写入db
-                        var t = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
-                        await t;
+                            BsonDocument retDoc = (BsonDocument)u.Result;
+                            info.AccountId = (retDoc["count"].ToInt64() + 1);
+
+                            //写入db
+                            var t = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
+                            await t;
+                        }
+                        else
+                        {
+                            //没有就插入一条
+                            var ib = new BsonDocument();
+                            ib.Add("_id", "AccountCount");
+                            ib.Add("count", 1);
+
+                            var i = CollectionMgr.Instance.CountBson.InsertOneAsync(ib);
+                            await i;
+
+                            //保存账号信息
+                            info.AccountId = 1;
+                            var ia = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
+                            await ia;
+                        }
 
                         r.Ret = (int)Result.ResultCode.RC_ok;
                     }
