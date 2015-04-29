@@ -19,6 +19,7 @@ namespace server
         public string weather { get; set; }
         public DateTime time { get; set; }
         public double[] coordinates { get; set; }
+        
         public void FillData(SendWeiboReq info)
         {
             content = info.content;
@@ -93,7 +94,7 @@ namespace server
                         var batch = cursor.Current;
                         foreach (var document in batch)
                         {
-                            r._id = document["_id"].AsString;
+                            r._id = document["_id"].ToString();
                             r.time = document["time"].ToUniversalTime();
                             break;
                         }

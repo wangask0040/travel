@@ -16,6 +16,13 @@ namespace server
         public ObjectId _id { get; set; }
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
+        public long ReadCount { get; set; }
+    }
+
+    class ReadInfo
+    {
+        public ObjectId _id { get; set; }
+        public long[] AccountId { get; set; }
     }
 
     class Query : HttpSvrBase
@@ -126,7 +133,30 @@ namespace server
                                         var bat = cs.Current;
                                         foreach (var doc in bat)
                                         {
-                                            r.info.Add(doc);
+                                            //浏览次数加1
+                                            var readFilter = Builders<ReadInfo>.Filter.Eq("_id", doc._id);
+                                            var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
+                                            var readOpt = new UpdateOptions();
+                                            readOpt.IsUpsert = true;
+                                            var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
+                                            await re;
+                                            if (re.Result.ModifiedCount == 1)
+                                            {
+                                                var readAddFilter = Builders<WeiboInfoTotal>.Filter.Eq("_id", document._id);
+                                                var readAddUpdate = Builders<WeiboInfoTotal>.Update.Inc("ReadCount", 1);
+                                                var readd = CollectionMgr.Instance.WeiboTotal.UpdateOneAsync(readAddFilter, readAddUpdate);
+                                                await readd;
+
+                                                if (readd.Result.ModifiedCount == 1)
+                                                {
+                                                    doc.ReadCount++;
+                                                }
+                                                r.info.Add(doc);
+                                            }
+                                            else
+                                            {
+                                                r.info.Add(doc);
+                                            }
                                         }
                                         break;
                                     }
@@ -172,12 +202,38 @@ namespace server
                         var batch = cursor.Current;
                         foreach (var document in batch)
                         {
-                            r.info.Add(document);
+                            //浏览次数加1
+                            var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
+                            var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
+                            var readOpt = new UpdateOptions();
+                            readOpt.IsUpsert = true;
+                            var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
+                            await re;
+                            if (re.Result.ModifiedCount == 1)
+                            {
+                                var readAddFilter = Builders<WeiboInfoTotal>.Filter.Eq("_id", document._id);
+                                var readAddUpdate = Builders<WeiboInfoTotal>.Update.Inc("ReadCount", 1);
+                                var readd = CollectionMgr.Instance.WeiboTotal.UpdateOneAsync(readAddFilter, readAddUpdate);
+                                await readd;
+
+                                if (readd.Result.ModifiedCount == 1)
+                                {
+                                    document.ReadCount++;
+                                }
+                                r.info.Add(document);
+                            }
+                            else
+                            {
+                                r.info.Add(document);
+                            }
+
                         }
 
                         break;
                     }
                 }
+
+
                 r.Ret = (int)Result.ResultCode.RC_ok;
             }
             catch

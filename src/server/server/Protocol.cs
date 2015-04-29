@@ -58,6 +58,7 @@ namespace server
         public double lati { get; set; }
         public int skip { get; set; }
         public bool preview { get; set; }
+        public long AccountId { get; set; }
     }
 
     class LocationQueryRsp : Result

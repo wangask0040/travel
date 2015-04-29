@@ -21,6 +21,8 @@ namespace server
         public IMongoCollection<BsonDocument> LikeBson { get; set; }
         public IMongoCollection<BsonDocument> CommentBson { get; set; }
 
+        public IMongoCollection<ReadInfo> ReadInfo { get; set; }
+
         public static readonly CollectionMgr Instance = new CollectionMgr();
 
         public void Init()
@@ -41,6 +43,8 @@ namespace server
 
             CommentInfo = m_client.GetDatabase("db").GetCollection<CommentInfo>("comment");
             CommentBson = m_client.GetDatabase("db").GetCollection<BsonDocument>("comment");
+
+            ReadInfo = m_client.GetDatabase("db").GetCollection<ReadInfo>("readinfo");
 
         }
     }
