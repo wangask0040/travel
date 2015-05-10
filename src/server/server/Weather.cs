@@ -13,11 +13,11 @@ namespace server
         {
             try
             {
-                HttpClient client = new HttpClient();
-                string reqstr = string.Format(url, address);
-                HttpResponseMessage response = await client.GetAsync(reqstr);
+                var client = new HttpClient();
+                var reqstr = string.Format(Url, address);
+                var response = await client.GetAsync(reqstr);
                 response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync();
                 // Above three lines can be replaced with new helper method below
                 // string responseBody = await client.GetStringAsync(uri);
 
@@ -28,12 +28,11 @@ namespace server
                 Console.WriteLine("\nException Caught!");
                 Console.WriteLine("Message :{0} ", e.Message);
             }
-            string str = "zxc";
+            const string str = "zxc";
             return str;
         }
 
-        private string url = "http://api.map.baidu.com/telematics/v3/weather?location={0}&output=json&ak=YdrtIvuTE25sNvAmxS05DgEo";
-       
+        private const string Url = "http://api.map.baidu.com/telematics/v3/weather?location={0}&output=json&ak=YdrtIvuTE25sNvAmxS05DgEo";
     }
 }
 

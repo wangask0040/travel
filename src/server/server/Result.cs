@@ -9,20 +9,19 @@ namespace server
 {
     class Result
     {
-        private int result;
-        private string msg;
+        private int _result;
 
-        public int Ret { get { return result; } set { result = value; msg = ResultMsg.Instance.Msg(value); } }
-        public string Msg { get { return msg; } private set{} }
+        public int Ret { get { return _result; } set { _result = value; Msg = ResultMsg.Instance.Msg(value); } }
+        public string Msg { get; private set; }
 
         public enum ResultCode
         {
-            RC_ok = 0,
-            RC_account_exists = 1,
-            RC_account_passwd_not_match = 2,
-            RC_failed = 3,
-            RC_account_not_exists = 4,
-            RC_alreay_like = 5,
+            RcOk = 0,
+            RcAccountExists = 1,
+            RcAccountPasswdNotMatch = 2,
+            RcFailed = 3,
+            RcAccountNotExists = 4,
+            RcAlreayLike = 5,
         }
     }
 
@@ -34,22 +33,25 @@ namespace server
 
         public string Msg(int ret)
         {
-            return m_msg[ret];
+            return _mMsg[ret];
         }
 
-        public void Init(string name)
+        public bool Init(string name)
         {
-            m_msg = new Dictionary<int, string>();
-            XmlDocument doc = new XmlDocument();
+            _mMsg = new Dictionary<int, string>();
+            var doc = new XmlDocument();
             doc.Load(name);
-            XmlElement root = doc["root"];
+            var root = doc["root"];
+            if (root == null) return false;
             foreach (XmlNode item in root.ChildNodes)
             {
-                int id = Convert.ToInt32(item.Attributes["id"].Value);
-                m_msg[id] = item.Attributes["msg"].Value;
+                if (item.Attributes == null) continue;
+                var id = Convert.ToInt32(item.Attributes["id"].Value);
+                _mMsg[id] = item.Attributes["msg"].Value;
             }
+            return true;
         }
 
-        private Dictionary<int, string> m_msg;
+        private Dictionary<int, string> _mMsg;
     }
 }

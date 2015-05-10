@@ -22,47 +22,47 @@ namespace server
     {
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
-            string s = GetBody(req);
-            asyFunc(s, rsp);
+            var s = GetBody(req);
+            AsyReg(s, rsp);
         }
 
-        private int Check(RegisterReq info)
+        private static int Check(RegisterReq info)
         {
             return 0;
         }
 
-        private async void asyFunc(string json, HttpListenerResponse rsp)
+        private async void AsyReg(string json, HttpListenerResponse rsp)
         {
             //先将json串，解析成类
-            RegisterReq reginfo = JsonConvert.DeserializeObject<RegisterReq>(json);
+            var reginfo = JsonConvert.DeserializeObject<RegisterReq>(json);
 
             //检查账号名，密码是否合法
-            Result r = new Result();
-            int ret = Check(reginfo);
+            var r = new Result();
+            var ret = Check(reginfo);
             if (ret == 0)
             {
                 //账号的数据结构
-                AccountInfo info = new AccountInfo();
-                info._id = reginfo.account;
-                info.Passwd = reginfo.passwdkey;
+                var info = new AccountInfo
+                {
+                    _id = reginfo.Account,
+                    Passwd = reginfo.Passwdkey
+                };
 
                 try
                 {
                     //先判断账号是否存在
                     var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
-                    CountOptions copt = new CountOptions();
-                    copt.Limit = 1;
+                    var copt = new CountOptions {Limit = 1};
                     var f = CollectionMgr.Instance.AccountInfo.CountAsync(findfilter, copt);
                     await f;
                     if (f.Result > 0)
                     {
-                        r.Ret = (int)Result.ResultCode.RC_account_exists;
+                        r.Ret = (int)Result.ResultCode.RcAccountExists;
                     }
                     else
                     {
                         //先判断有没有
-                        var countopt = new CountOptions();
-                        countopt.Limit = 1;
+                        var countopt = new CountOptions {Limit = 1};
                         var filter = Builders<BsonDocument>.Filter.Eq("_id", "AccountCount");
                         var c = CollectionMgr.Instance.CountBson.CountAsync(filter, countopt);
                         await c;
@@ -74,7 +74,7 @@ namespace server
                             var u = CollectionMgr.Instance.CountBson.FindOneAndUpdateAsync(filter, updefine);
                             await u;
 
-                            BsonDocument retDoc = (BsonDocument)u.Result;
+                            var retDoc = (BsonDocument)u.Result;
                             info.AccountId = (retDoc["count"].ToInt64() + 1);
 
                             //写入db
@@ -84,9 +84,7 @@ namespace server
                         else
                         {
                             //没有就插入一条
-                            var ib = new BsonDocument();
-                            ib.Add("_id", "AccountCount");
-                            ib.Add("count", 1);
+                            var ib = new BsonDocument {{"_id", "AccountCount"}, {"count", 1}};
 
                             var i = CollectionMgr.Instance.CountBson.InsertOneAsync(ib);
                             await i;
@@ -97,13 +95,13 @@ namespace server
                             await ia;
                         }
 
-                        r.Ret = (int)Result.ResultCode.RC_ok;
+                        r.Ret = (int)Result.ResultCode.RcOk;
                     }
                 }
                 catch
                 {
                     //发生异常
-                    r.Ret = (int)Result.ResultCode.RC_account_exists;
+                    r.Ret = (int)Result.ResultCode.RcAccountExists;
                 }
             }
             else
@@ -113,7 +111,7 @@ namespace server
             }
 
             //回包
-            string str = JsonConvert.SerializeObject(r);
+            var str = JsonConvert.SerializeObject(r);
             Response(rsp, str);
         }
     }

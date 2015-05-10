@@ -11,14 +11,14 @@ namespace server
     {
         public void Start(string url)
         {
-            m_listen = new HttpListener();
-            m_listen.Prefixes.Add(url);
-            m_listen.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-            m_listen.Start();
+            _mListen = new HttpListener();
+            _mListen.Prefixes.Add(url);
+            _mListen.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
+            _mListen.Start();
 
             Console.WriteLine("start listening {0}", url);
 
-            Get(m_listen);
+            Get(_mListen);
         }
 
         public virtual void Proc(HttpListenerRequest req, HttpListenerResponse rsp) { }
@@ -26,8 +26,8 @@ namespace server
         private void Send(HttpListenerContext cxt)
         {
 
-            HttpListenerRequest req = cxt.Request;
-            HttpListenerResponse rsp = cxt.Response;
+            var req = cxt.Request;
+            var rsp = cxt.Response;
 
             if (!req.HasEntityBody)
             {
@@ -51,16 +51,16 @@ namespace server
 
         public string GetBody(HttpListenerRequest req)
         {
-            System.IO.Stream body = req.InputStream;
-            System.Text.Encoding encoding = req.ContentEncoding;
-            System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
+            var body = req.InputStream;
+            var encoding = req.ContentEncoding;
+            var reader = new System.IO.StreamReader(body, encoding);
 
             if (req.ContentType != null)
             {
                 Console.WriteLine("Client data content type {0}", req.ContentType);
             }
 
-            string s = reader.ReadToEnd();
+            var s = reader.ReadToEnd();
             Console.WriteLine("recv:{0},lenght:{1}", s, req.ContentLength64);
             body.Close();
             reader.Close();
@@ -72,16 +72,17 @@ namespace server
             try
             {
                 rsp.ContentType = "application/json";
-                byte[] buf = System.Text.Encoding.Default.GetBytes(str);
+                var buf = System.Text.Encoding.Default.GetBytes(str);
                 rsp.OutputStream.Write(buf, 0, buf.Length);
                 rsp.OutputStream.Close();
             }
             catch
             {
+                // ignored
             }
         }
 
-        private HttpListener m_listen;
+        private HttpListener _mListen;
     }
 
 }

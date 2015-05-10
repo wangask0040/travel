@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -10,7 +11,7 @@ namespace server
 {
     class CollectionMgr
     {
-        public IMongoClient m_client { get; set; }
+        public IMongoClient MClient { get; set; }
         public IMongoCollection<WeiboInfoTotal> WeiboTotal { get; set; }
         public IMongoCollection<UserInfo> UserInfo { get; set; }
         public IMongoCollection<CommentInfo> CommentInfo { get; set; }
@@ -25,27 +26,31 @@ namespace server
 
         public static readonly CollectionMgr Instance = new CollectionMgr();
 
-        public void Init()
+        public bool Init()
         {
-            Config c = new Config(Config.ConfigFile);
-            m_client = new MongoClient(c.Root["weibodb"].InnerText);
+            var c = new Config(Config.ConfigFile);
+            var xmlElement = c.Root["weibodb"];
+            if (xmlElement != null)
+                MClient = new MongoClient(xmlElement.InnerText);
+            else
+                return false;
 
-            UserInfo = m_client.GetDatabase("db").GetCollection<UserInfo>("userinfo");
+            UserInfo = MClient.GetDatabase("db").GetCollection<UserInfo>("userinfo");
 
-            AccountInfo = m_client.GetDatabase("db").GetCollection<AccountInfo>("account");
-            CountBson = m_client.GetDatabase("db").GetCollection<BsonDocument>("count");
+            AccountInfo = MClient.GetDatabase("db").GetCollection<AccountInfo>("account");
+            CountBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("count");
 
-            WeiboTotal = m_client.GetDatabase("db").GetCollection<WeiboInfoTotal>("weibo");
-            WeiboInfo = m_client.GetDatabase("db").GetCollection<WeiboInfo>("weibo");
-            WeiboBson = m_client.GetDatabase("db").GetCollection<BsonDocument>("weibo");
+            WeiboTotal = MClient.GetDatabase("db").GetCollection<WeiboInfoTotal>("weibo");
+            WeiboInfo = MClient.GetDatabase("db").GetCollection<WeiboInfo>("weibo");
+            WeiboBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("weibo");
 
-            LikeBson = m_client.GetDatabase("db").GetCollection<BsonDocument>("like");
+            LikeBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("like");
 
-            CommentInfo = m_client.GetDatabase("db").GetCollection<CommentInfo>("comment");
-            CommentBson = m_client.GetDatabase("db").GetCollection<BsonDocument>("comment");
+            CommentInfo = MClient.GetDatabase("db").GetCollection<CommentInfo>("comment");
+            CommentBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("comment");
 
-            ReadInfo = m_client.GetDatabase("db").GetCollection<ReadInfo>("readinfo");
-
+            ReadInfo = MClient.GetDatabase("db").GetCollection<ReadInfo>("readinfo");
+            return true;
         }
     }
 }

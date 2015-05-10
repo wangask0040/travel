@@ -27,8 +27,8 @@ namespace server
 
     class Query : HttpSvrBase
     {
-        private readonly int limit = 3;
-        private readonly int notLimit = 5;
+        private const int Limit = 3;
+        private const int NotLimit = 5;
 
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
@@ -36,22 +36,22 @@ namespace server
             {
                 case "/location":
                     {
-                        string s = GetBody(req);
-                        LocationQueryReq info = JsonConvert.DeserializeObject<LocationQueryReq>(s);
+                        var s = GetBody(req);
+                        var info = JsonConvert.DeserializeObject<LocationQueryReq>(s);
                         QueryLocation(req, rsp, info);
                     }
                     break;
                 case "/friend":
                     {
-                        string s = GetBody(req);
-                        FriendQueryReq info = JsonConvert.DeserializeObject<FriendQueryReq>(s);
+                        var s = GetBody(req);
+                        var info = JsonConvert.DeserializeObject<FriendQueryReq>(s);
                         QueryFriend(req, rsp, info);
                     }
                     break;
                 case "/comment":
                     {
-                        string s = GetBody(req);
-                        CommentQueryReq info = JsonConvert.DeserializeObject<CommentQueryReq>(s);
+                        var s = GetBody(req);
+                        var info = JsonConvert.DeserializeObject<CommentQueryReq>(s);
                         QueryComment(req, rsp, info);
                     }
                     break;
@@ -63,11 +63,13 @@ namespace server
 
         private async void QueryComment(HttpListenerRequest req, HttpListenerResponse rsp, CommentQueryReq info)
         {
-            CommentQueryRsp r = new CommentQueryRsp();
+            var r = new CommentQueryRsp();
 
             var filter = Builders<CommentInfo>.Filter.Eq("_id", new ObjectId(info._id));
-            var opt = new FindOptions<CommentInfo>();
-            opt.Projection = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.skip * notLimit), notLimit);
+            var opt = new FindOptions<CommentInfo>
+            {
+                Projection = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.Skip*NotLimit), NotLimit)
+            };
             var f = CollectionMgr.Instance.CommentInfo.FindAsync(filter, opt);
 
             try
@@ -81,10 +83,10 @@ namespace server
                         {
                             foreach (var arr in document.ContentArray)
                             {
-                                r.info.Add(arr);
+                                r.Info.Add(arr);
                             }
 
-                            r.Ret = (int)Result.ResultCode.RC_ok;
+                            r.Ret = (int)Result.ResultCode.RcOk;
                             break;
                         }
                         break;
@@ -93,20 +95,19 @@ namespace server
             }
             catch
             {
-                r.Ret = (int)Result.ResultCode.RC_failed;
+                r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            string json = JsonConvert.SerializeObject(r);
+            var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
         }
 
         private async void QueryFriend(HttpListenerRequest req, HttpListenerResponse rsp, FriendQueryReq info)
         {
-            FriendQueryRsp r = new FriendQueryRsp();
+            var r = new FriendQueryRsp();
 
             var filter = Builders<UserInfo>.Filter.Eq("_id", info.AccountId);
-            var opt = new FindOptions<UserInfo>();
-            opt.Projection = Builders<UserInfo>.Projection.Include("follow");
+            var opt = new FindOptions<UserInfo> {Projection = Builders<UserInfo>.Projection.Include("follow")};
 
             try
             {
@@ -118,12 +119,11 @@ namespace server
                         var batch = cursor.Current;
                         foreach (var document in batch)
                         {
-                            if (document.follow.Length > 0)
+                            if (document.Follow.Length > 0)
                             {
-                                var ufilter = Builders<WeiboInfoTotal>.Filter.In("AccountId", document.follow.AsEnumerable());
-                                var uopt = new FindOptions<WeiboInfoTotal>();
-                                uopt.Limit = (info.preview ? limit : notLimit);
-                                uopt.Skip = (info.skip * uopt.Limit);
+                                var ufilter = Builders<WeiboInfoTotal>.Filter.In("AccountId", document.Follow.AsEnumerable());
+                                var uopt = new FindOptions<WeiboInfoTotal> {Limit = (info.Preview ? Limit : NotLimit)};
+                                uopt.Skip = (info.Skip * uopt.Limit);
 
                                 var u = CollectionMgr.Instance.WeiboTotal.FindAsync(ufilter, uopt);
                                 using (var cs = await u)
@@ -136,8 +136,7 @@ namespace server
                                             //浏览次数加1
                                             var readFilter = Builders<ReadInfo>.Filter.Eq("_id", doc._id);
                                             var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
-                                            var readOpt = new UpdateOptions();
-                                            readOpt.IsUpsert = true;
+                                            var readOpt = new UpdateOptions {IsUpsert = true};
                                             var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
                                             await re;
                                             if (re.Result.ModifiedCount == 1)
@@ -151,11 +150,11 @@ namespace server
                                                 {
                                                     doc.ReadCount++;
                                                 }
-                                                r.info.Add(doc);
+                                                r.Info.Add(doc);
                                             }
                                             else
                                             {
-                                                r.info.Add(doc);
+                                                r.Info.Add(doc);
                                             }
                                         }
                                         break;
@@ -169,27 +168,29 @@ namespace server
 
                         break;
                     }
-                    r.Ret = (int)Result.ResultCode.RC_ok;
+                    r.Ret = (int)Result.ResultCode.RcOk;
                 }
             }
             catch
             {
-                r.Ret = (int)Result.ResultCode.RC_failed;
+                r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            string json = JsonConvert.SerializeObject(r);
+            var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
         }
 
         private async void QueryLocation(HttpListenerRequest req, HttpListenerResponse rsp, LocationQueryReq info)
         {
-            LocationQueryRsp r = new LocationQueryRsp();
+            var r = new LocationQueryRsp();
 
-            var filter = Builders<WeiboInfoTotal>.Filter.Near("coordinates", info.longi, info.lati);
-            var fopt = new FindOptions<WeiboInfoTotal>();
-            fopt.Limit = (info.preview ? limit : notLimit);
-            fopt.Sort = Builders<WeiboInfoTotal>.Sort.Descending("time");
-            fopt.Skip = (info.skip * fopt.Limit);
+            var filter = Builders<WeiboInfoTotal>.Filter.Near("coordinates", info.Longi, info.Lati);
+            var fopt = new FindOptions<WeiboInfoTotal>
+            {
+                Limit = (info.Preview ? Limit : NotLimit),
+                Sort = Builders<WeiboInfoTotal>.Sort.Descending("time")
+            };
+            fopt.Skip = (info.Skip * fopt.Limit);
 
             try
             {
@@ -205,8 +206,7 @@ namespace server
                             //浏览次数加1
                             var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
                             var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
-                            var readOpt = new UpdateOptions();
-                            readOpt.IsUpsert = true;
+                            var readOpt = new UpdateOptions {IsUpsert = true};
                             var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
                             await re;
                             if (re.Result.ModifiedCount == 1)
@@ -220,11 +220,11 @@ namespace server
                                 {
                                     document.ReadCount++;
                                 }
-                                r.info.Add(document);
+                                r.Info.Add(document);
                             }
                             else
                             {
-                                r.info.Add(document);
+                                r.Info.Add(document);
                             }
 
                         }
@@ -234,14 +234,14 @@ namespace server
                 }
 
 
-                r.Ret = (int)Result.ResultCode.RC_ok;
+                r.Ret = (int)Result.ResultCode.RcOk;
             }
             catch
             {
-                r.Ret = (int)Result.ResultCode.RC_failed;
+                r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            string json = JsonConvert.SerializeObject(r);
+            var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
         }
     }

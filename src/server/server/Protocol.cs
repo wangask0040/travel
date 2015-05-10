@@ -9,8 +9,8 @@ namespace server
 {
     class LoginReq
     {
-        public string account { get; set; }
-        public string passwdkey { get; set; }
+        public string Account { get; set; }
+        public string PasswdKey { get; set; }
     }
 
     class LoginRsp : Result
@@ -20,19 +20,19 @@ namespace server
 
     class RegisterReq
     {
-        public string account { get; set; }
-        public string passwdkey { get; set; }
+        public string Account { get; set; }
+        public string Passwdkey { get; set; }
     }
 
     class SendWeiboReq
     {
-        public string content { get; set; }
-        public string[] photo { get; set; }
-        public double longi { get; set; }
-        public double lati { get; set; }
+        public string Content { get; set; }
+        public string[] Photo { get; set; }
+        public double Longi { get; set; }
+        public double Lati { get; set; }
         public long AccountId { get; set; }
-        public string address { get; set; }
-        public string weather { get; set; }
+        public string Address { get; set; }
+        public string Weather { get; set; }
     }
 
     class LikeWeiboReq
@@ -43,40 +43,40 @@ namespace server
 
     class CommentWeiboReq : LikeWeiboReq
     {
-        public string content { get; set; }
+        public string Content { get; set; }
     }
 
     class SendWeiboRsp : Result
     {
         public string _id { get; set; }
-        public DateTime time { get; set; }
+        public DateTime Time { get; set; }
     }
 
     class LocationQueryReq
     {
-        public double longi { get; set; }
-        public double lati { get; set; }
-        public int skip { get; set; }
-        public bool preview { get; set; }
+        public double Longi { get; set; }
+        public double Lati { get; set; }
+        public int Skip { get; set; }
+        public bool Preview { get; set; }
         public long AccountId { get; set; }
     }
 
     class LocationQueryRsp : Result
     {
-        public List<WeiboInfoTotal> info = new List<WeiboInfoTotal>();
+        public List<WeiboInfoTotal> Info = new List<WeiboInfoTotal>();
     }
 
     class FollowReq
     {
-        public long startId { get; set; }
-        public long followId { get; set; }
+        public long StartId { get; set; }
+        public long FollowId { get; set; }
     }
 
     class FriendQueryReq
     {
         public long AccountId { get; set; }
-        public int skip { get; set; }
-        public bool preview { get; set; }
+        public int Skip { get; set; }
+        public bool Preview { get; set; }
     }
 
     class FriendQueryRsp : LocationQueryRsp
@@ -85,11 +85,11 @@ namespace server
     class CommentQueryReq
     {
         public string _id { get; set; }
-        public int skip { get; set; }
+        public int Skip { get; set; }
     }
 
     class CommentQueryRsp : Result
     {
-        public List<CommentUnit> info = new List<CommentUnit>();
+        public List<CommentUnit> Info = new List<CommentUnit>();
     }
 }

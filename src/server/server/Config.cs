@@ -11,16 +11,16 @@ namespace server
     {
         public const string ConfigFile = "../../conf/config.xml";
  
-        public XmlElement Root { get { return m_root; } }
+        public XmlElement Root { get { return MRoot; } }
 
         public Config(string name)
         {
-            m_doc = new XmlDocument();
-            m_doc.Load(name);
-            m_root = m_doc["root"];
+            MDoc = new XmlDocument();
+            MDoc.Load(name);
+            MRoot = MDoc["root"];
         }
 
-        protected XmlElement m_root;
-        protected XmlDocument m_doc;
+        protected XmlElement MRoot;
+        protected XmlDocument MDoc;
     }
 }
