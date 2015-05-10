@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -30,7 +26,7 @@ namespace server
             Time = new DateTime();
             var ts = new TimeSpan(8, 0, 0);
             Time = DateTime.Now + ts;
-            Coordinates = new double[] { info.Longi, info.Lati };
+            Coordinates = new [] { info.Longi, info.Lati };
         }
     }
 
@@ -112,7 +108,7 @@ namespace server
             Response(rsp, json);
         }
 
-        private async void LikeWeibo(HttpListenerRequest req, HttpListenerResponse rsp, LikeWeiboReq info)
+        private async void LikeWeibo(HttpListenerResponse rsp, LikeWeiboReq info)
         {
             var r = new Result();
 
@@ -141,7 +137,7 @@ namespace server
             Response(rsp, json);
         }
 
-        private async void CommentWeibo(HttpListenerRequest req, HttpListenerResponse rsp, CommentWeiboReq info)
+        private async void CommentWeibo(HttpListenerResponse rsp, CommentWeiboReq info)
         {
             var r = new Result();
 
@@ -174,7 +170,7 @@ namespace server
             Response(rsp, json);
         }
 
-        private async  void Follow(HttpListenerRequest req, HttpListenerResponse rsp, FollowReq info)
+        private async  void Follow(HttpListenerResponse rsp, FollowReq info)
         {
             var r = new Result();
 
@@ -219,21 +215,21 @@ namespace server
                     {
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<LikeWeiboReq>(s);
-                        LikeWeibo(req, rsp, info);
+                        LikeWeibo(rsp, info);
                     }
                     break;
                 case "/commentswb":
                     {
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<CommentWeiboReq>(s);
-                        CommentWeibo(req, rsp, info);
+                        CommentWeibo(rsp, info);
                     }
                     break;
                 case "/follow":
                     {
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<FollowReq>(s);
-                        Follow(req, rsp, info);
+                        Follow(rsp, info);
                     }
                     break;
                 default:

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Bson.Serialization;
 using System.Net;
 
 namespace server
@@ -38,21 +33,21 @@ namespace server
                     {
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<LocationQueryReq>(s);
-                        QueryLocation(req, rsp, info);
+                        QueryLocation(rsp, info);
                     }
                     break;
                 case "/friend":
                     {
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<FriendQueryReq>(s);
-                        QueryFriend(req, rsp, info);
+                        QueryFriend(rsp, info);
                     }
                     break;
                 case "/comment":
                     {
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<CommentQueryReq>(s);
-                        QueryComment(req, rsp, info);
+                        QueryComment(rsp, info);
                     }
                     break;
                 default:
@@ -61,7 +56,7 @@ namespace server
 
         }
 
-        private async void QueryComment(HttpListenerRequest req, HttpListenerResponse rsp, CommentQueryReq info)
+        private async void QueryComment(HttpListenerResponse rsp, CommentQueryReq info)
         {
             var r = new CommentQueryRsp();
 
@@ -102,7 +97,7 @@ namespace server
             Response(rsp, json);
         }
 
-        private async void QueryFriend(HttpListenerRequest req, HttpListenerResponse rsp, FriendQueryReq info)
+        private async void QueryFriend(HttpListenerResponse rsp, FriendQueryReq info)
         {
             var r = new FriendQueryRsp();
 
@@ -180,7 +175,7 @@ namespace server
             Response(rsp, json);
         }
 
-        private async void QueryLocation(HttpListenerRequest req, HttpListenerResponse rsp, LocationQueryReq info)
+        private async void QueryLocation(HttpListenerResponse rsp, LocationQueryReq info)
         {
             var r = new LocationQueryRsp();
 

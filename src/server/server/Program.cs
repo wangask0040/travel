@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace server
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            ResultMsg.Instance.Init(ResultMsg.ConfigFile);
+            if (!ResultMsg.Instance.Init(ResultMsg.ConfigFile))
+                return;
 
-            CollectionMgr.Instance.Init();
+            if (!CollectionMgr.Instance.Init())
+                return;
 
             var conf = new Config(Config.ConfigFile);
             var reg = new Register();

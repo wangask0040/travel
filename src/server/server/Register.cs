@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Net;
@@ -74,7 +69,7 @@ namespace server
                             var u = CollectionMgr.Instance.CountBson.FindOneAndUpdateAsync(filter, updefine);
                             await u;
 
-                            var retDoc = (BsonDocument)u.Result;
+                            var retDoc = u.Result;
                             info.AccountId = (retDoc["count"].ToInt64() + 1);
 
                             //写入db

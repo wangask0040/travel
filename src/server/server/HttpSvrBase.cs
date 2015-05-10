@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 
 namespace server
@@ -72,7 +69,7 @@ namespace server
             try
             {
                 rsp.ContentType = "application/json";
-                var buf = System.Text.Encoding.Default.GetBytes(str);
+                var buf = Encoding.Default.GetBytes(str);
                 rsp.OutputStream.Write(buf, 0, buf.Length);
                 rsp.OutputStream.Close();
             }

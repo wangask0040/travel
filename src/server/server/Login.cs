@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using MongoDB.Bson;
+﻿using Newtonsoft.Json;
 using MongoDB.Driver;
 using System.Net;
 
@@ -14,7 +8,7 @@ namespace server
     {
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
-            string s = GetBody(req);
+            var s = GetBody(req);
             AsyncFunc(s, rsp);
         }
 
