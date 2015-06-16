@@ -179,11 +179,11 @@ namespace server
         {
             var r = new LocationQueryRsp();
 
-            var filter = Builders<WeiboInfoTotal>.Filter.Near("coordinates", info.Longi, info.Lati);
+            var filter = Builders<WeiboInfoTotal>.Filter.Near("Coordinates", info.Longi, info.Lati);
             var fopt = new FindOptions<WeiboInfoTotal>
             {
                 Limit = (info.Preview ? Limit : NotLimit),
-                Sort = Builders<WeiboInfoTotal>.Sort.Descending("time")
+                Sort = Builders<WeiboInfoTotal>.Sort.Descending("Time")
             };
             fopt.Skip = (info.Skip * fopt.Limit);
 

@@ -75,7 +75,7 @@ namespace server
                 await t;
 
                 //查找
-                var filter = (Builders<BsonDocument>.Filter.Eq("time", info.Time)
+                var filter = (Builders<BsonDocument>.Filter.Eq("Time", info.Time)
                     & Builders<BsonDocument>.Filter.Eq("AccountId", info.AccountId));
 
                 var fopt = new FindOptions<BsonDocument> {Limit = 1};
@@ -90,7 +90,7 @@ namespace server
                         foreach (var document in batch)
                         {
                             r._id = document["_id"].ToString();
-                            r.Time = document["time"].ToUniversalTime();
+                            r.Time = document["Time"].ToUniversalTime();
                             break;
                         }
                         break;
