@@ -14,6 +14,7 @@ namespace server
         public IMongoCollection<WeiboInfo> WeiboInfo { get; set; }
         public IMongoCollection<BsonDocument> WeiboBson { get; set; }
         public IMongoCollection<BsonDocument> LikeBson { get; set; }
+        public IMongoCollection<LikeInfo> LikeInfo { get; set; }
         public IMongoCollection<BsonDocument> CommentBson { get; set; }
 
         public IMongoCollection<ReadInfo> ReadInfo { get; set; }
@@ -32,6 +33,7 @@ namespace server
             UserInfo = MClient.GetDatabase("db").GetCollection<UserInfo>("userinfo");
 
             AccountInfo = MClient.GetDatabase("db").GetCollection<AccountInfo>("account");
+
             CountBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("count");
 
             WeiboTotal = MClient.GetDatabase("db").GetCollection<WeiboInfoTotal>("weibo");
@@ -39,6 +41,7 @@ namespace server
             WeiboBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("weibo");
 
             LikeBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("like");
+            LikeInfo = MClient.GetDatabase("db").GetCollection<LikeInfo>("like");
 
             CommentInfo = MClient.GetDatabase("db").GetCollection<CommentInfo>("comment");
             CommentBson = MClient.GetDatabase("db").GetCollection<BsonDocument>("comment");
