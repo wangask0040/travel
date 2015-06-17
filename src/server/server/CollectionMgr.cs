@@ -5,19 +5,19 @@ namespace server
 {
     class CollectionMgr
     {
-        public IMongoClient MClient { get; set; }
-        public IMongoCollection<WeiboInfoTotal> WeiboTotal { get; set; }
-        public IMongoCollection<UserInfo> UserInfo { get; set; }
-        public IMongoCollection<CommentInfo> CommentInfo { get; set; }
-        public IMongoCollection<AccountInfo> AccountInfo { get; set; }
-        public IMongoCollection<BsonDocument> CountBson { get; set; }
-        public IMongoCollection<WeiboInfo> WeiboInfo { get; set; }
-        public IMongoCollection<BsonDocument> WeiboBson { get; set; }
-        public IMongoCollection<BsonDocument> LikeBson { get; set; }
-        public IMongoCollection<LikeInfo> LikeInfo { get; set; }
-        public IMongoCollection<BsonDocument> CommentBson { get; set; }
+        public IMongoClient MClient { get; private set; }
+        public IMongoCollection<WeiboInfoTotal> WeiboTotal { get; private set; }
+        public IMongoCollection<UserInfo> UserInfo { get; private set; }
+        public IMongoCollection<CommentInfo> CommentInfo { get; private set; }
+        public IMongoCollection<AccountInfo> AccountInfo { get; private set; }
+        public IMongoCollection<BsonDocument> CountBson { get; private set; }
+        public IMongoCollection<WeiboInfo> WeiboInfo { get; private set; }
+        public IMongoCollection<BsonDocument> WeiboBson { get; private set; }
+        public IMongoCollection<BsonDocument> LikeBson { get; private set; }
+        public IMongoCollection<LikeInfo> LikeInfo { get; private set; }
+        public IMongoCollection<BsonDocument> CommentBson { get; private set; }
 
-        public IMongoCollection<ReadInfo> ReadInfo { get; set; }
+        public IMongoCollection<ReadInfo> ReadInfo { get; private set; }
 
         public static readonly CollectionMgr Instance = new CollectionMgr();
 
