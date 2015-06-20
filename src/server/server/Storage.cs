@@ -61,6 +61,11 @@ namespace server
         public long[] Fans { get; set; }
     }
 
+    class LikeInfo
+    {
+        public ObjectId _id { get; set; }
+        public long[] AccountId { get; set; }
+    }
 
     class Storage : HttpSvrBase
     {

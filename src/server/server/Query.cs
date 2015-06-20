@@ -36,6 +36,13 @@ namespace server
                         QueryLocation(rsp, info);
                     }
                     break;
+                case "/count":
+                    {
+                        var s = GetBody(req);
+                        var info = JsonConvert.DeserializeObject<CountQueryReq>(s);
+                        QueryCount(rsp, info);
+                    }
+                    break;
                 case "/friend":
                     {
                         var s = GetBody(req);
@@ -48,6 +55,13 @@ namespace server
                         var s = GetBody(req);
                         var info = JsonConvert.DeserializeObject<CommentQueryReq>(s);
                         QueryComment(rsp, info);
+                    }
+                    break;
+                case "/like":
+                    {
+                        var s = GetBody(req);
+                        var info = JsonConvert.DeserializeObject<LikeQueryReq>(s);
+                        QueryLike(rsp, info);
                     }
                     break;
                 default:
@@ -63,7 +77,7 @@ namespace server
             var filter = Builders<CommentInfo>.Filter.Eq("_id", new ObjectId(info._id));
             var opt = new FindOptions<CommentInfo>
             {
-                Projection = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.Skip*NotLimit), NotLimit)
+                Projection = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.Skip * NotLimit), NotLimit)
             };
             var f = CollectionMgr.Instance.CommentInfo.FindAsync(filter, opt);
 
@@ -102,7 +116,7 @@ namespace server
             var r = new FriendQueryRsp();
 
             var filter = Builders<UserInfo>.Filter.Eq("_id", info.AccountId);
-            var opt = new FindOptions<UserInfo> {Projection = Builders<UserInfo>.Projection.Include("follow")};
+            var opt = new FindOptions<UserInfo> { Projection = Builders<UserInfo>.Projection.Include("follow") };
 
             try
             {
@@ -117,7 +131,7 @@ namespace server
                             if (document.Follow.Length > 0)
                             {
                                 var ufilter = Builders<WeiboInfoTotal>.Filter.In("AccountId", document.Follow.AsEnumerable());
-                                var uopt = new FindOptions<WeiboInfoTotal> {Limit = (info.Preview ? Limit : NotLimit)};
+                                var uopt = new FindOptions<WeiboInfoTotal> { Limit = (info.Preview ? Limit : NotLimit) };
                                 uopt.Skip = (info.Skip * uopt.Limit);
 
                                 var u = CollectionMgr.Instance.WeiboTotal.FindAsync(ufilter, uopt);
@@ -131,7 +145,7 @@ namespace server
                                             //浏览次数加1
                                             var readFilter = Builders<ReadInfo>.Filter.Eq("_id", doc._id);
                                             var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
-                                            var readOpt = new UpdateOptions {IsUpsert = true};
+                                            var readOpt = new UpdateOptions { IsUpsert = true };
                                             var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
                                             await re;
                                             if (re.Result.ModifiedCount == 1)
@@ -201,7 +215,7 @@ namespace server
                             //浏览次数加1
                             var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
                             var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
-                            var readOpt = new UpdateOptions {IsUpsert = true};
+                            var readOpt = new UpdateOptions { IsUpsert = true };
                             var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
                             await re;
                             if (re.Result.ModifiedCount == 1)
@@ -236,6 +250,66 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
+            var json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
+        private async void QueryCount(HttpListenerResponse rsp, CountQueryReq info)
+        {
+            var filter = Builders<WeiboInfoTotal>.Filter.Near("Coordinates", info.Longi, info.Lati)
+                & Builders<WeiboInfoTotal>.Filter.Gt("Time", info.LastViewTime);
+            var c = CollectionMgr.Instance.WeiboTotal.CountAsync(filter);
+            var r = new CountQueryRsp();
+
+            try
+            {
+                await c;
+
+                r.Ret = (int)Result.ResultCode.RcOk;
+                r.Count = c.Result;
+            }
+            catch
+            {
+                r.Ret = (int)Result.ResultCode.RcFailed;
+            }
+            
+            var json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
+        private async void QueryLike(HttpListenerResponse rsp, LikeQueryReq info)
+        {
+            var objid = new ObjectId(info._id);
+            var filter = Builders<LikeInfo>.Filter.Eq("_id", objid);
+            var opt = new FindOptions<LikeInfo>
+            {
+                Projection = Builders<LikeInfo>.Projection.Slice("AccountId", (info.Skip * NotLimit), NotLimit)
+            };
+
+            var l = CollectionMgr.Instance.LikeInfo.FindAsync(filter, opt);
+            
+            var r = new LikeQueryRsp();
+
+            try
+            {
+                using (var cursor = await l)
+                {
+                    while (await cursor.MoveNextAsync())
+                    {
+                        var batch = cursor.Current;
+                        foreach (var document in batch)
+                        {
+                            r.AccountId = document.AccountId;
+                        }
+                    }
+                }
+
+                r.Ret = (int)Result.ResultCode.RcOk;
+            }
+            catch
+            {
+                r.Ret = (int)Result.ResultCode.RcFailed;
+            }
             var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
         }

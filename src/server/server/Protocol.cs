@@ -88,4 +88,27 @@ namespace server
     {
         public List<CommentUnit> Info = new List<CommentUnit>();
     }
+
+    class CountQueryReq
+    {
+        public double Longi { get; set; }
+        public double Lati { get; set; }
+        public DateTime LastViewTime { get; set; }
+    }
+
+    class CountQueryRsp : Result
+    {
+        public long Count { get; set; }
+    }
+
+    class LikeQueryReq
+    {
+        public string _id { get; set; }
+        public int Skip { get; set; }
+    }
+
+    class LikeQueryRsp : Result
+    {
+        public long[] AccountId { get; set; }
+    }
 }
