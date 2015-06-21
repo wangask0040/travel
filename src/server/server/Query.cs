@@ -20,6 +20,7 @@ namespace server
         public long[] AccountId { get; set; }
     }
 
+
     class Query : HttpSvrBase
     {
         private const int Limit = 3;
@@ -63,6 +64,13 @@ namespace server
                         var info = JsonConvert.DeserializeObject<LikeQueryReq>(s);
                         QueryLike(rsp, info);
                     }
+                    break;
+                case "/getsign":
+                {
+                    var s = GetBody(req);
+                    var info = JsonConvert.DeserializeObject<GetSignReq>(s);
+                    GetSign(rsp, info);
+                }
                     break;
                 default:
                     break;
@@ -310,6 +318,28 @@ namespace server
             {
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
+            var json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
+        private async void GetSign(HttpListenerResponse rsp, GetSignReq info)
+        {
+            var r = new GetSignRsp {Ret = (int) Result.ResultCode.RcOk};
+
+            //检查一下该账号是否存在
+            var filter = Builders<AccountInfo>.Filter.Eq("AccountId", info.AccountId);
+            var c = CollectionMgr.Instance.AccountInfo.CountAsync(filter);
+            await c;
+            if (c.Result > 0)
+            {
+                var s = new Sign();
+                r.SignStr = s.MakeSign(info.AccountId.ToString());   
+            }
+            else
+            {
+                r.Ret = (int) Result.ResultCode.RcAccountNotExists;
+            }
+
             var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
         }

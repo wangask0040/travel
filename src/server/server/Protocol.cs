@@ -111,4 +111,14 @@ namespace server
     {
         public long[] AccountId { get; set; }
     }
+
+    class GetSignReq
+    {
+        public long AccountId { get; set; }
+    }
+
+    class GetSignRsp : Result
+    {
+        public string SignStr { get; set; }
+    }
 }
