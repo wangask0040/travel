@@ -8,7 +8,7 @@ namespace server
     class AccountInfo
     {
         public string _id { get; set; }
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
         public string Passwd { get; set; }
     }
 
@@ -70,7 +70,7 @@ namespace server
                             await u;
 
                             var retDoc = u.Result;
-                            info.AccountId = (retDoc["count"].ToInt64() + 1);
+                            info.AccountId = (uint)(retDoc["count"].ToInt32() + 1);
 
                             //写入db
                             var t = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);

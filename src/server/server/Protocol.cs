@@ -11,7 +11,7 @@ namespace server
 
     class LoginRsp : Result
     {
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
     }
 
     class RegisterReq
@@ -26,7 +26,7 @@ namespace server
         public string[] Photo { get; set; }
         public double Longi { get; set; }
         public double Lati { get; set; }
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
         public string Address { get; set; }
         public string Weather { get; set; }
     }
@@ -34,7 +34,7 @@ namespace server
     class LikeWeiboReq
     {
         public string _id { get; set; }
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
     }
 
     class CommentWeiboReq : LikeWeiboReq
@@ -54,7 +54,7 @@ namespace server
         public double Lati { get; set; }
         public int Skip { get; set; }
         public bool Preview { get; set; }
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
     }
 
     class LocationQueryRsp : Result
@@ -70,7 +70,7 @@ namespace server
 
     class FriendQueryReq
     {
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
         public int Skip { get; set; }
         public bool Preview { get; set; }
     }
@@ -114,7 +114,7 @@ namespace server
 
     class GetSignReq
     {
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
     }
 
     class GetSignRsp : Result
