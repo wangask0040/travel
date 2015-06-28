@@ -144,6 +144,41 @@ namespace server
             Response(rsp, json);
         }
 
+        private async void SetIcon(HttpListenerResponse rsp, SetUserIconReq info)
+        {
+            var r = new Result();
+            var fliter = Builders<UserInfo>.Filter.Eq("_id", info.AccountId);
+            var update = Builders<UserInfo>.Update.Set("Icon", info.Icon);
+
+            var uop = new UpdateOptions {IsUpsert = true};
+            
+            try
+            {
+                var u = CollectionMgr.Instance.UserInfo.UpdateOneAsync(fliter, update, uop);
+                await u;
+
+                var update2 = Builders<UserInfo>.Update.Set("Name", info.Name);
+                var u2 = CollectionMgr.Instance.UserInfo.UpdateOneAsync(fliter, update2);
+
+                if (u.Result.ModifiedCount == 1 || u2.Result.ModifiedCount == 1)
+                {
+                    r.Ret = (int)Result.ResultCode.RcOk;
+                }
+                else
+                {
+                    r.Ret = (int)Result.ResultCode.RcFailed;
+                }
+            }
+            catch
+            {
+
+                r.Ret = (int)Result.ResultCode.RcFailed;
+            }
+
+            var json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             switch (req.RawUrl)
@@ -177,6 +212,13 @@ namespace server
                         var info = JsonConvert.DeserializeObject<FollowReq>(s);
                         Follow(rsp, info);
                     }
+                    break;
+                case "/seticon":
+                {
+                    var s = GetBody(req);
+                    var info = JsonConvert.DeserializeObject<SetUserIconReq>(s);
+                    SetIcon(rsp, info);
+                }
                     break;
                 default:
                     break;
