@@ -10,7 +10,7 @@ namespace server
     {
         public string Content { get; set; }
         public string[] Photo { get; set; }
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
         public string Address { get; set; }
         public string Weather { get; set; }
         public DateTime Time { get; set; }
@@ -32,7 +32,7 @@ namespace server
 
     class CommentUnit
     {
-        public long AccountId { get; set; }
+        public uint AccountId { get; set; }
         public string Content { get; set; }
         public DateTime Time { get; set; }
 
