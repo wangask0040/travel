@@ -8,14 +8,14 @@ namespace server
     {
         public void Start(string url)
         {
-            _mListen = new HttpListener();
-            _mListen.Prefixes.Add(url);
-            _mListen.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-            _mListen.Start();
+            _listen = new HttpListener();
+            _listen.Prefixes.Add(url);
+            _listen.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
+            _listen.Start();
 
             Console.WriteLine("start listening {0}", url);
 
-            Get(_mListen);
+            Get(_listen);
         }
 
         public virtual void Proc(HttpListenerRequest req, HttpListenerResponse rsp) { }
@@ -79,7 +79,7 @@ namespace server
             }
         }
 
-        private HttpListener _mListen;
+        private HttpListener _listen;
     }
 
 }

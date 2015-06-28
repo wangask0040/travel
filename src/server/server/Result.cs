@@ -30,12 +30,12 @@ namespace server
 
         public string Msg(int ret)
         {
-            return _mMsg[ret];
+            return _msg[ret];
         }
 
         public bool Init(string name)
         {
-            _mMsg = new Dictionary<int, string>();
+            _msg = new Dictionary<int, string>();
             var doc = new XmlDocument();
             doc.Load(name);
             var root = doc["root"];
@@ -44,11 +44,11 @@ namespace server
             {
                 if (item.Attributes == null) continue;
                 var id = Convert.ToInt32(item.Attributes["id"].Value);
-                _mMsg[id] = item.Attributes["msg"].Value;
+                _msg[id] = item.Attributes["msg"].Value;
             }
             return true;
         }
 
-        private Dictionary<int, string> _mMsg;
+        private Dictionary<int, string> _msg;
     }
 }
