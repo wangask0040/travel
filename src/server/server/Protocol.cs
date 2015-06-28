@@ -121,4 +121,21 @@ namespace server
     {
         public string SignStr { get; set; }
     }
+
+    class UserIcon
+    {
+        public uint AccountId { get; set; }
+        public string Name { get; set; }
+        public string Icon { get; set; }
+    }
+
+    class GetUserIconReq
+    {
+        public uint[] AccountIdArray { get; set; }
+    }
+
+    class GetUserIconRsp : Result
+    {
+        public List<UserIcon> IconList = new List<UserIcon>();
+    }
 }

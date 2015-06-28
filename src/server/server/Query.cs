@@ -59,6 +59,13 @@ namespace server
                     GetSign(rsp, info);
                 }
                     break;
+                case "/usericon":
+                {
+                    var s = GetBody(req);
+                    var info = JsonConvert.DeserializeObject<GetUserIconReq>(s);
+                    QueryUserIcon(rsp, info);
+                }
+                    break;
                 default:
                     break;
             }
@@ -325,6 +332,45 @@ namespace server
             else
             {
                 r.Ret = (int) Result.ResultCode.RcAccountNotExists;
+            }
+
+            var json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
+        private async void QueryUserIcon(HttpListenerResponse rsp, GetUserIconReq info)
+        {
+            var r = new GetUserIconRsp();
+
+            var filter = Builders<UserInfo>.Filter.In("_id", info.AccountIdArray);
+            var f = CollectionMgr.Instance.UserInfo.FindAsync(filter);
+
+            try
+            {
+                using (var cursor = await f)
+                {
+                    while (await cursor.MoveNextAsync())
+                    {
+                        var batch = cursor.Current;
+                        foreach (var document in batch)
+                        {
+                            var icon = new UserIcon
+                            {
+                                AccountId = document._id,
+                                Icon = document.Icon,
+                                Name = document.Name
+                            };
+
+                            r.IconList.Add(icon);
+                        }
+                    }
+                }
+
+                r.Ret = (int)Result.ResultCode.RcOk;
+            }
+            catch
+            {
+                r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
             var json = JsonConvert.SerializeObject(r);
