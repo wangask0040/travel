@@ -6,7 +6,19 @@ using System.Net;
 
 namespace server
 {
-    
+    class WeiboInfoTotal : WeiboInfo
+    {
+        public ObjectId _id { get; set; }
+        public int LikeCount { get; set; }
+        public int CommentCount { get; set; }
+        public long ReadCount { get; set; }
+    }
+
+    class ReadInfo
+    {
+        public ObjectId _id { get; set; }
+        public long[] AccountId { get; set; }
+    }
 
 
     class Query : HttpSvrBase

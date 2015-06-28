@@ -5,6 +5,14 @@ using System.Net;
 
 namespace server
 {
+    class AccountInfo
+    {
+        public string _id { get; set; }
+        public long AccountId { get; set; }
+        public string Passwd { get; set; }
+    }
+
+
     class Register : HttpSvrBase
     {
         public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
