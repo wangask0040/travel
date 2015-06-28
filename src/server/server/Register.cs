@@ -5,12 +5,7 @@ using System.Net;
 
 namespace server
 {
-    class AccountInfo
-    {
-        public string _id { get; set; }
-        public uint AccountId { get; set; }
-        public string Passwd { get; set; }
-    }
+    
 
 
     class Register : HttpSvrBase

@@ -64,8 +64,8 @@ namespace server
 
     class FollowReq
     {
-        public long StartId { get; set; }
-        public long FollowId { get; set; }
+        public uint StartId { get; set; }
+        public uint FollowId { get; set; }
     }
 
     class FriendQueryReq
@@ -109,7 +109,7 @@ namespace server
 
     class LikeQueryRsp : Result
     {
-        public long[] AccountId { get; set; }
+        public uint[] AccountId { get; set; }
     }
 
     class GetSignReq

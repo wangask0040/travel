@@ -6,66 +6,7 @@ using System.Net;
 
 namespace server
 {
-    class WeiboInfo
-    {
-        public string Content { get; set; }
-        public string[] Photo { get; set; }
-        public uint AccountId { get; set; }
-        public string Address { get; set; }
-        public string Weather { get; set; }
-        public DateTime Time { get; set; }
-        public double[] Coordinates { get; set; }
-        
-        public void FillData(SendWeiboReq info)
-        {
-            Content = info.Content;
-            Photo = info.Photo;
-            AccountId = info.AccountId;
-            Address = info.Address;
-            Weather = info.Weather;
-            Time = new DateTime();
-            var ts = new TimeSpan(8, 0, 0);
-            Time = DateTime.Now + ts;
-            Coordinates = new [] { info.Longi, info.Lati };
-        }
-    }
-
-    class CommentUnit
-    {
-        public uint AccountId { get; set; }
-        public string Content { get; set; }
-        public DateTime Time { get; set; }
-
-        public void FillData(CommentWeiboReq info)
-        {
-            AccountId = info.AccountId;
-            Content = info.Content;
-            Time = new DateTime();
-            var ts = new TimeSpan(8, 0, 0);
-            Time = DateTime.Now + ts;
-        }
-    }
-
-    class CommentInfo
-    {
-        public ObjectId _id { get; set; }
-        public CommentUnit[] ContentArray { get; set; }
-    }
-
-    class UserInfo
-    {
-        public long _id { get; set; }
-        public string Icon { get; set; }
-        public string Name { get; set; }
-        public long[] Follow { get; set; }
-        public long[] Fans { get; set; }
-    }
-
-    class LikeInfo
-    {
-        public ObjectId _id { get; set; }
-        public long[] AccountId { get; set; }
-    }
+    
 
     class Storage : HttpSvrBase
     {
