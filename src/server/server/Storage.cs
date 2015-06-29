@@ -24,26 +24,17 @@ namespace server
                 var filter = (Builders<BsonDocument>.Filter.Eq("Time", info.Time)
                     & Builders<BsonDocument>.Filter.Eq("AccountId", info.AccountId));
 
-                var fopt = new FindOptions<BsonDocument> {Limit = 1};
-
-                var f = CollectionMgr.Instance.WeiboBson.FindAsync(filter, fopt);
-
-                using (var cursor = await f)
+                var f = await CollectionMgr.Instance.WeiboBson.Find(filter).Limit(1).ToListAsync();
+                if (f.Count == 1)
                 {
-                    while (await cursor.MoveNextAsync())
-                    {
-                        var batch = cursor.Current;
-                        foreach (var document in batch)
-                        {
-                            r._id = document["_id"].ToString();
-                            r.Time = document["Time"].ToUniversalTime();
-                            break;
-                        }
-                        break;
-                    }
+                    r._id =  f[0]["_id"].ToString();
+                    r.Time = f[0]["Time"].ToUniversalTime();
+                    r.Ret = (int)Result.ResultCode.RcOk;
                 }
-
-                r.Ret = (int)Result.ResultCode.RcOk;
+                else
+                {
+                    r.Ret = (int)Result.ResultCode.RcFailed;
+                }
             }
             catch
             {
