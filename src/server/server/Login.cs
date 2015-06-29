@@ -36,28 +36,15 @@ namespace server
             else
             {
                 findfilter &= Builders<AccountInfo>.Filter.Eq("Passwd", info.Passwd);
-                var f = CollectionMgr.Instance.AccountInfo.FindAsync(findfilter);
-                using (var cs = await f)
+                var f = await CollectionMgr.Instance.AccountInfo.Find(findfilter).ToListAsync();
+                if (f.Count == 1)
                 {
-
-                    if (await cs.MoveNextAsync())
-                    {
-                        var bat = cs.Current;
-                        var it = bat.GetEnumerator();
-                        if (it.MoveNext())
-                        {
-                            r.Ret = (int)Result.ResultCode.RcOk;
-                            r.AccountId = it.Current.AccountId;
-                        }
-                        else
-                        {
-                            r.Ret = (int)Result.ResultCode.RcAccountPasswdNotMatch;
-                        }
-                    }
-                    else
-                    {
-                        r.Ret = (int)Result.ResultCode.RcAccountPasswdNotMatch;
-                    }
+                    r.Ret = (int)Result.ResultCode.RcOk;
+                    r.AccountId = f[0].AccountId;
+                }
+                else
+                {
+                    r.Ret = (int)Result.ResultCode.RcAccountPasswdNotMatch;
                 }
             }
 
