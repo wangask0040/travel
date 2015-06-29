@@ -196,55 +196,42 @@ namespace server
             var r = new LocationQueryRsp();
 
             var filter = Builders<WeiboInfoTotal>.Filter.Near("Coordinates", info.Longi, info.Lati);
-            var fopt = new FindOptions<WeiboInfoTotal>
-            {
-                Limit = (info.Preview ? Limit : NotLimit),
-                Sort = Builders<WeiboInfoTotal>.Sort.Descending("Time")
-            };
-            fopt.Skip = (info.Skip * fopt.Limit);
+            int limit = (info.Preview ? Limit : NotLimit);
+            int skip = (info.Skip * limit);
+            var sort = Builders<WeiboInfoTotal>.Sort.Descending("Time");
 
             try
             {
-                var f = CollectionMgr.Instance.WeiboTotal.FindAsync(filter, fopt);
+                var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Skip(skip).Limit(limit)
+                    .Sort(sort).ToListAsync();
 
-                using (var cursor = await f)
+                foreach(var document in f)
                 {
-                    while (await cursor.MoveNextAsync())
+                    //浏览次数加1
+                    var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
+                    var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
+                    var readOpt = new UpdateOptions { IsUpsert = true };
+                    var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
+                    await re;
+                    if (re.Result.ModifiedCount == 1)
                     {
-                        var batch = cursor.Current;
-                        foreach (var document in batch)
+                        var readAddFilter = Builders<WeiboInfoTotal>.Filter.Eq("_id", document._id);
+                        var readAddUpdate = Builders<WeiboInfoTotal>.Update.Inc("ReadCount", 1);
+                        var readd = CollectionMgr.Instance.WeiboTotal.UpdateOneAsync(readAddFilter, readAddUpdate);
+                        await readd;
+
+                        if (readd.Result.ModifiedCount == 1)
                         {
-                            //浏览次数加1
-                            var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
-                            var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
-                            var readOpt = new UpdateOptions { IsUpsert = true };
-                            var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
-                            await re;
-                            if (re.Result.ModifiedCount == 1)
-                            {
-                                var readAddFilter = Builders<WeiboInfoTotal>.Filter.Eq("_id", document._id);
-                                var readAddUpdate = Builders<WeiboInfoTotal>.Update.Inc("ReadCount", 1);
-                                var readd = CollectionMgr.Instance.WeiboTotal.UpdateOneAsync(readAddFilter, readAddUpdate);
-                                await readd;
-
-                                if (readd.Result.ModifiedCount == 1)
-                                {
-                                    document.ReadCount++;
-                                }
-                                r.Info.Add(document);
-                            }
-                            else
-                            {
-                                r.Info.Add(document);
-                            }
-
+                            document.ReadCount++;
                         }
-
-                        break;
+                        r.Info.Add(document);
+                    }
+                    else
+                    {
+                        r.Info.Add(document);
                     }
                 }
-
-
+                
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
             catch
