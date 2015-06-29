@@ -330,29 +330,22 @@ namespace server
             var r = new GetUserIconRsp();
 
             var filter = Builders<UserInfo>.Filter.In("_id", info.AccountIdArray);
-            var f = CollectionMgr.Instance.UserInfo.FindAsync(filter);
-
+            
             try
             {
-                using (var cursor = await f)
+                var f = await CollectionMgr.Instance.UserInfo.Find(filter).ToListAsync();
+
+                foreach (var document in f)
                 {
-                    while (await cursor.MoveNextAsync())
+                    var icon = new UserIcon
                     {
-                        var batch = cursor.Current;
-                        foreach (var document in batch)
-                        {
-                            var icon = new UserIcon
-                            {
-                                AccountId = document._id,
-                                Icon = document.Icon,
-                                Name = document.Name
-                            };
+                        AccountId = document._id,
+                        Icon = document.Icon,
+                        Name = document.Name
+                    };
 
-                            r.IconList.Add(icon);
-                        }
-                    }
+                    r.IconList.Add(icon);
                 }
-
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
             catch
