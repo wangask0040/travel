@@ -27,11 +27,11 @@ namespace server
             var req = cxt.Request;
             var rsp = cxt.Response;
 
-            if (!req.HasEntityBody)
-            {
-                Console.WriteLine("No client data was sent with the request.");
-                return;
-            }
+//             if (!req.HasEntityBody)
+//             {
+//                 Console.WriteLine("No client data was sent with the request.");
+//                 return;
+//             }
 
             RouteMethod(req, rsp);
         }
