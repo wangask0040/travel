@@ -6,16 +6,23 @@ namespace server
 {
     class Login : HttpSvrBase
     {
-        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
+        public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             var s = GetBody(req);
-            AsyncFunc(s, rsp);
+            var info = JsonConvert.DeserializeObject<LoginReq>(s);
+            Lgn(info, rsp);
         }
 
-        private async void AsyncFunc(string json, HttpListenerResponse rsp)
+        public override void GetHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
-            var req = JsonConvert.DeserializeObject<LoginReq>(json);
+            var info = new LoginReq();
+            info.Account = req.QueryString.Get("Account");
+            info.PasswdKey = req.QueryString.Get("PasswdKey");
+            Lgn(info, rsp);
+        }
 
+        private async void Lgn(LoginReq req, HttpListenerResponse rsp)
+        {
             var info = new AccountInfo
             {
                 _id = req.Account,

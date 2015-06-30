@@ -13,9 +13,9 @@ namespace server
         private const int Limit = 3;
         private const int NotLimit = 5;
 
-        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
+        public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
-            switch (req.RawUrl)
+            switch (req.Url.AbsolutePath)
             {
                 case "/location":
                     {

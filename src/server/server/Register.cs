@@ -10,10 +10,19 @@ namespace server
 
     class Register : HttpSvrBase
     {
-        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
+        public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             var s = GetBody(req);
-            AsyReg(s, rsp);
+            var info = JsonConvert.DeserializeObject<RegisterReq>(s);
+            Reg(info, rsp);
+        }
+
+        public override void GetHandle(HttpListenerRequest req, HttpListenerResponse rsp)
+        {
+            var info = new RegisterReq();
+            info.Account = req.QueryString.Get("Account");
+            info.Passwdkey = req.QueryString.Get("Passwdkey");
+            Reg(info, rsp);
         }
 
         private static int Check(RegisterReq info)
@@ -21,11 +30,8 @@ namespace server
             return 0;
         }
 
-        private async void AsyReg(string json, HttpListenerResponse rsp)
+        private async void Reg(RegisterReq reginfo, HttpListenerResponse rsp)
         {
-            //先将json串，解析成类
-            var reginfo = JsonConvert.DeserializeObject<RegisterReq>(json);
-
             //检查账号名，密码是否合法
             var r = new Result();
             var ret = Check(reginfo);

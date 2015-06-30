@@ -170,9 +170,9 @@ namespace server
             Response(rsp, json);
         }
 
-        public override void Proc(HttpListenerRequest req, HttpListenerResponse rsp)
+        public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
-            switch (req.RawUrl)
+            switch (req.Url.AbsolutePath)
             {
                 case "/sendwb":
                     {

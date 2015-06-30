@@ -18,7 +18,8 @@ namespace server
             Get(_listen);
         }
 
-        public virtual void Proc(HttpListenerRequest req, HttpListenerResponse rsp) { }
+        public virtual void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp) { }
+        public virtual void GetHandle(HttpListenerRequest req, HttpListenerResponse rsp) { }
 
         private void Send(HttpListenerContext cxt)
         {
@@ -32,7 +33,7 @@ namespace server
                 return;
             }
 
-            Proc(req, rsp);
+            RouteMethod(req, rsp);
         }
 
         public async void Get(HttpListener lst)
@@ -76,6 +77,19 @@ namespace server
             catch
             {
                 // ignored
+            }
+        }
+
+        protected void RouteMethod(HttpListenerRequest req, HttpListenerResponse rsp)
+        {
+            switch(req.HttpMethod)
+            {
+                case "POST":
+                    PostHandle(req, rsp);
+                    break;
+                case "GET":
+                    GetHandle(req, rsp);
+                    break;
             }
         }
 
