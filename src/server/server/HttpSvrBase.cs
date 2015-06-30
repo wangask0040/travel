@@ -88,6 +88,7 @@ namespace server
                     PostHandle(req, rsp);
                     break;
                 case "GET":
+                    Console.WriteLine("recv:{0}", req.Url);
                     GetHandle(req, rsp);
                     break;
             }
