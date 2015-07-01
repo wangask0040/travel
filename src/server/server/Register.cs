@@ -5,9 +5,6 @@ using System.Net;
 
 namespace server
 {
-    
-
-
     class Register : HttpSvrBase
     {
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
@@ -73,9 +70,6 @@ namespace server
                             var retDoc = u.Result;
                             info.AccountId = (uint)(retDoc["count"].ToInt32() + 1);
 
-                            //写入db
-                            var t = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
-                            await t;
                         }
                         else
                         {
@@ -85,11 +79,22 @@ namespace server
                             var i = CollectionMgr.Instance.CountBson.InsertOneAsync(ib);
                             await i;
 
-                            //保存账号信息
                             info.AccountId = 1;
-                            var ia = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
-                            await ia;
                         }
+
+                        //写入db
+                        var t = CollectionMgr.Instance.AccountInfo.InsertOneAsync(info);
+                        await t;
+
+                        //用户的昵称和Icon写入
+                        var icon = new UserInfo
+                        {
+                            _id = info.AccountId,
+                            Name = reginfo.Name,
+                            Icon = reginfo.Icon
+                        };
+
+                        await CollectionMgr.Instance.UserInfo.InsertOneAsync(icon);
 
                         r.Ret = (int)Result.ResultCode.RcOk;
                     }

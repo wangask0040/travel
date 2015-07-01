@@ -18,12 +18,21 @@ namespace server
     {
         public string Account { get; set; }
         public string Passwdkey { get; set; }
+        public string Name { get; set; }
+        public string Icon { get; set; }
+
+    }
+
+    class PhotoUnit
+    {
+        public string Path { get; set; }
+        public long CreateTime { get; set; }
     }
 
     class SendWeiboReq
     {
         public string Content { get; set; }
-        public string[] Photo { get; set; }
+        public PhotoUnit Photo { get; set; }
         public double Longi { get; set; }
         public double Lati { get; set; }
         public uint AccountId { get; set; }
