@@ -19,6 +19,7 @@ namespace server
             RcFailed = 3,
             RcAccountNotExists = 4,
             RcAlreayLike = 5,
+            RcJsonFormatErr = 6,
         }
     }
 

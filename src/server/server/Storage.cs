@@ -6,7 +6,7 @@ using System.Net;
 
 namespace server
 {
-    
+
 
     class Storage : HttpSvrBase
     {
@@ -27,7 +27,7 @@ namespace server
                 var f = await CollectionMgr.Instance.WeiboBson.Find(filter).Limit(1).ToListAsync();
                 if (f.Count == 1)
                 {
-                    r._id =  f[0]["_id"].ToString();
+                    r._id = f[0]["_id"].ToString();
                     r.Time = f[0]["Time"].ToUniversalTime();
                     r.Ret = (int)Result.ResultCode.RcOk;
                 }
@@ -53,7 +53,7 @@ namespace server
             var objid = new ObjectId(info._id);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", objid);
             var update = Builders<BsonDocument>.Update.AddToSet("AccountId", info.AccountId);
-            var uop = new UpdateOptions {IsUpsert = true};
+            var uop = new UpdateOptions { IsUpsert = true };
 
             var u = CollectionMgr.Instance.LikeBson.UpdateOneAsync(filter, update, uop);
             await u;
@@ -86,7 +86,7 @@ namespace server
 
                 var pfilter = Builders<BsonDocument>.Filter.Eq("_id", objid);
                 var pup = Builders<BsonDocument>.Update.Push("ContentArray", unit);
-                var popt = new UpdateOptions {IsUpsert = true};
+                var popt = new UpdateOptions { IsUpsert = true };
 
                 var p = CollectionMgr.Instance.CommentBson.UpdateOneAsync(pfilter, pup, popt);
                 await p;
@@ -107,13 +107,13 @@ namespace server
             Response(rsp, json);
         }
 
-        private async  void Follow(HttpListenerResponse rsp, FollowReq info)
+        private async void Follow(HttpListenerResponse rsp, FollowReq info)
         {
             var r = new Result();
 
             var filter = Builders<UserInfo>.Filter.Eq("_id", info.StartId);
             var up = Builders<UserInfo>.Update.AddToSet("follow", info.FollowId);
-            var uop = new UpdateOptions {IsUpsert = true};
+            var uop = new UpdateOptions { IsUpsert = true };
 
             try
             {
@@ -141,8 +141,8 @@ namespace server
             var fliter = Builders<UserInfo>.Filter.Eq("_id", info.AccountId);
             var update = Builders<UserInfo>.Update.Set("Icon", info.Icon);
 
-            var uop = new UpdateOptions {IsUpsert = true};
-            
+            var uop = new UpdateOptions { IsUpsert = true };
+
             try
             {
                 var u = CollectionMgr.Instance.UserInfo.UpdateOneAsync(fliter, update, uop);
@@ -177,39 +177,46 @@ namespace server
                 case "/sendwb":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<SendWeiboReq>(s);
-                        var weiboinfo = new WeiboInfo();
-                        weiboinfo.FillData(info);
-                        SaveWeibo(req, rsp, weiboinfo);
+                        var info = new SendWeiboReq();
+                        if (GetBodyJson<SendWeiboReq>(s, ref info, rsp))
+                        {
+                            var weiboinfo = new WeiboInfo();
+                            weiboinfo.FillData(info);
+                            SaveWeibo(req, rsp, weiboinfo);
+                        }
                     }
                     break;
                 case "/likewb":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<LikeWeiboReq>(s);
-                        LikeWeibo(rsp, info);
+                        var info = new LikeWeiboReq();
+                        if (GetBodyJson<LikeWeiboReq>(s, ref info, rsp))
+                            LikeWeibo(rsp, info);
                     }
                     break;
                 case "/commentswb":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<CommentWeiboReq>(s);
-                        CommentWeibo(rsp, info);
+                        var info = new CommentWeiboReq();
+                        if (GetBodyJson<CommentWeiboReq>(s, ref info, rsp))
+                            CommentWeibo(rsp, info);
                     }
                     break;
                 case "/follow":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<FollowReq>(s);
-                        Follow(rsp, info);
+                        var info = new FollowReq();
+                        if (GetBodyJson<FollowReq>(s, ref info, rsp))
+                            Follow(rsp, info);
                     }
                     break;
                 case "/seticon":
-                {
-                    var s = GetBody(req);
-                    var info = JsonConvert.DeserializeObject<SetUserIconReq>(s);
-                    SetIcon(rsp, info);
-                }
+                    {
+                        var s = GetBody(req);
+                        var info = new SetUserIconReq();
+                        if (GetBodyJson<SetUserIconReq>(s, ref info, rsp))
+                            SetIcon(rsp, info);
+                    }
                     break;
                 default:
                     break;

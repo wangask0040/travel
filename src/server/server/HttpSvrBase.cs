@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace server
 {
@@ -91,6 +92,23 @@ namespace server
                     Console.WriteLine("recv:{0}", req.Url);
                     GetHandle(req, rsp);
                     break;
+            }
+        }
+
+        protected bool GetBodyJson<T>(string s, ref T t, HttpListenerResponse rsp)
+        {
+            try 
+            {
+                t = JsonConvert.DeserializeObject<T>(s);
+                return true;
+            }
+            catch
+            {
+                var r = new Result();
+                r.Ret = (int)Result.ResultCode.RcJsonFormatErr;
+                string str = JsonConvert.SerializeObject(r);
+                Response(rsp, str);
+                return false;
             }
         }
 

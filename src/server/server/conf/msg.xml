@@ -6,4 +6,5 @@
   <item id="3" msg="操作失败！"></item>
   <item id="4" msg="账号不存在！"></item>
   <item id="5" msg="你已经赞过！"></item>
+  <item id="6" msg="Json格式非法！"></item>
 </root>

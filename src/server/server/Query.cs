@@ -6,7 +6,7 @@ using System.Net;
 
 namespace server
 {
-    
+
 
     class Query : HttpSvrBase
     {
@@ -20,51 +20,58 @@ namespace server
                 case "/location":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<LocationQueryReq>(s);
-                        QueryLocation(rsp, info);
+                        var info = new LocationQueryReq();
+                        if (GetBodyJson<LocationQueryReq>(s, ref info, rsp))
+                            QueryLocation(rsp, info);
                     }
                     break;
                 case "/count":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<CountQueryReq>(s);
-                        QueryCount(rsp, info);
+                        var info = new CountQueryReq();
+                        if (GetBodyJson<CountQueryReq>(s, ref info, rsp))
+                            QueryCount(rsp, info);
                     }
                     break;
                 case "/friend":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<FriendQueryReq>(s);
-                        QueryFriend(rsp, info);
+                        var info = new FriendQueryReq();
+                        if (GetBodyJson<FriendQueryReq>(s, ref info, rsp))
+                            QueryFriend(rsp, info);
                     }
                     break;
                 case "/comment":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<CommentQueryReq>(s);
-                        QueryComment(rsp, info);
+                        var info = new CommentQueryReq();
+                        if (GetBodyJson<CommentQueryReq>(s, ref info, rsp))
+                            QueryComment(rsp, info);
                     }
                     break;
                 case "/like":
                     {
                         var s = GetBody(req);
-                        var info = JsonConvert.DeserializeObject<LikeQueryReq>(s);
-                        QueryLike(rsp, info);
+                        var info = new LikeQueryReq();
+                        if (GetBodyJson<LikeQueryReq>(s, ref info, rsp))
+                            QueryLike(rsp, info);
                     }
                     break;
                 case "/getsign":
-                {
-                    var s = GetBody(req);
-                    var info = JsonConvert.DeserializeObject<GetSignReq>(s);
-                    GetSign(rsp, info);
-                }
+                    {
+                        var s = GetBody(req);
+                        var info = new GetSignReq();
+                        if (GetBodyJson<GetSignReq>(s, ref info, rsp))
+                            GetSign(rsp, info);
+                    }
                     break;
                 case "/usericon":
-                {
-                    var s = GetBody(req);
-                    var info = JsonConvert.DeserializeObject<GetUserIconReq>(s);
-                    QueryUserIcon(rsp, info);
-                }
+                    {
+                        var s = GetBody(req);
+                        var info = new GetUserIconReq();
+                        if (GetBodyJson<GetUserIconReq>(s, ref info, rsp))
+                            QueryUserIcon(rsp, info);
+                    }
                     break;
                 default:
                     break;
@@ -205,7 +212,7 @@ namespace server
                 var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Skip(skip).Limit(limit)
                     .Sort(sort).ToListAsync();
 
-                foreach(var document in f)
+                foreach (var document in f)
                 {
                     //浏览次数加1
                     var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
@@ -231,7 +238,7 @@ namespace server
                         r.Info.Add(document);
                     }
                 }
-                
+
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
             catch
@@ -261,7 +268,7 @@ namespace server
             {
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
-            
+
             var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
         }
@@ -276,7 +283,7 @@ namespace server
             };
 
             var l = CollectionMgr.Instance.LikeInfo.FindAsync(filter, opt);
-            
+
             var r = new LikeQueryRsp();
 
             try
@@ -305,7 +312,7 @@ namespace server
 
         private async void GetSign(HttpListenerResponse rsp, GetSignReq info)
         {
-            var r = new GetSignRsp {Ret = (int) Result.ResultCode.RcOk};
+            var r = new GetSignRsp { Ret = (int)Result.ResultCode.RcOk };
 
             //检查一下该账号是否存在
             var filter = Builders<AccountInfo>.Filter.Eq("AccountId", info.AccountId);
@@ -314,11 +321,11 @@ namespace server
             if (c.Result > 0)
             {
                 var s = new Sign();
-                r.SignStr = s.MakeSign(info.AccountId.ToString());   
+                r.SignStr = s.MakeSign(info.AccountId.ToString());
             }
             else
             {
-                r.Ret = (int) Result.ResultCode.RcAccountNotExists;
+                r.Ret = (int)Result.ResultCode.RcAccountNotExists;
             }
 
             var json = JsonConvert.SerializeObject(r);
@@ -330,7 +337,7 @@ namespace server
             var r = new GetUserIconRsp();
 
             var filter = Builders<UserInfo>.Filter.In("_id", info.AccountIdArray);
-            
+
             try
             {
                 var f = await CollectionMgr.Instance.UserInfo.Find(filter).ToListAsync();

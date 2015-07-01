@@ -9,8 +9,9 @@ namespace server
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             var s = GetBody(req);
-            var info = JsonConvert.DeserializeObject<LoginReq>(s);
-            Lgn(info, rsp);
+            var info = new LoginReq();
+            if (GetBodyJson<LoginReq>(s, ref info, rsp))
+                Lgn(info, rsp);
         }
 
         public override void GetHandle(HttpListenerRequest req, HttpListenerResponse rsp)

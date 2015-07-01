@@ -10,8 +10,9 @@ namespace server
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
             var s = GetBody(req);
-            var info = JsonConvert.DeserializeObject<RegisterReq>(s);
-            Reg(info, rsp);
+            var info = new RegisterReq();
+            if (GetBodyJson<RegisterReq>(s, ref info, rsp))
+                Reg(info, rsp);
         }
 
         public override void GetHandle(HttpListenerRequest req, HttpListenerResponse rsp)
@@ -45,7 +46,7 @@ namespace server
                 {
                     //先判断账号是否存在
                     var findfilter = Builders<AccountInfo>.Filter.Eq("_id", info._id);
-                    var copt = new CountOptions {Limit = 1};
+                    var copt = new CountOptions { Limit = 1 };
                     var f = CollectionMgr.Instance.AccountInfo.CountAsync(findfilter, copt);
                     await f;
                     if (f.Result > 0)
@@ -55,7 +56,7 @@ namespace server
                     else
                     {
                         //先判断有没有
-                        var countopt = new CountOptions {Limit = 1};
+                        var countopt = new CountOptions { Limit = 1 };
                         var filter = Builders<BsonDocument>.Filter.Eq("_id", "AccountCount");
                         var c = CollectionMgr.Instance.CountBson.CountAsync(filter, countopt);
                         await c;
@@ -74,7 +75,7 @@ namespace server
                         else
                         {
                             //没有就插入一条
-                            var ib = new BsonDocument {{"_id", "AccountCount"}, {"count", 1}};
+                            var ib = new BsonDocument { { "_id", "AccountCount" }, { "count", 1 } };
 
                             var i = CollectionMgr.Instance.CountBson.InsertOneAsync(ib);
                             await i;
