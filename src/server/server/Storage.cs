@@ -150,6 +150,7 @@ namespace server
 
                 var update2 = Builders<UserInfo>.Update.Set("Name", info.Name);
                 var u2 = CollectionMgr.Instance.UserInfo.UpdateOneAsync(fliter, update2);
+                await u2;
 
                 if (u.Result.ModifiedCount == 1 || u2.Result.ModifiedCount == 1)
                 {
