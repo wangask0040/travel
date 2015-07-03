@@ -9,17 +9,12 @@ namespace server
         public uint AccountId { get; set; }
         public string Passwd { get; set; }
     }
-    
-    class PhotoInfo
-    {
-        public string Path { get; set; }
-        public DateTime CreateTime { get; set; }
-    }
 
     class WeiboInfo
     {
         public string Content { get; set; }
-        public PhotoInfo Photo { get; set; }
+        public string Path { get; set; }
+        public DateTime CreateTime { get; set; }
         public uint AccountId { get; set; }
         public string Address { get; set; }
         public string Weather { get; set; }
@@ -29,12 +24,11 @@ namespace server
         public void FillData(SendWeiboReq info)
         {
             Content = info.Content;
-            Photo = new PhotoInfo();
 
-            Photo.Path = info.Photo.Path;
-            Photo.CreateTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            Path = info.Photo.Path;
+            CreateTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
             var s = new TimeSpan(info.Photo.CreateTime * 10000000);
-            Photo.CreateTime += s;
+            CreateTime += s;
 
             AccountId = info.AccountId;
             Address = info.Address;
