@@ -18,7 +18,7 @@ namespace server
         {
             var info = new LoginReq();
             info.Account = req.QueryString.Get("Account");
-            info.PasswdKey = req.QueryString.Get("PasswdKey");
+            info.Passwdkey = req.QueryString.Get("PasswdKey");
             Lgn(info, rsp);
         }
 
@@ -27,7 +27,7 @@ namespace server
             var info = new AccountInfo
             {
                 _id = req.Account,
-                Passwd = req.PasswdKey
+                Passwd = req.Passwdkey
             };
 
             var r = new LoginRsp();

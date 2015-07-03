@@ -6,7 +6,7 @@ namespace server
     class LoginReq
     {
         public string Account { get; set; }
-        public string PasswdKey { get; set; }
+        public string Passwdkey { get; set; }
     }
 
     class LoginRsp : Result
