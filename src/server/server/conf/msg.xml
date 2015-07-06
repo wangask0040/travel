@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="gb2312"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <item id="0" msg="操作成功！"></item>
-  <item id="1" msg="账号已存在！"></item>
-  <item id="2" msg="账号密码不匹配！"></item>
-  <item id="3" msg="操作失败！"></item>
-  <item id="4" msg="账号不存在！"></item>
-  <item id="5" msg="你已经赞过！"></item>
-  <item id="6" msg="Json格式非法！"></item>
+  <item id="0" msg="success"></item>
+  <item id="1" msg="account already exists"></item>
+  <item id="2" msg="account and passwd not match"></item>
+  <item id="3" msg="failed"></item>
+  <item id="4" msg="account not exists"></item>
+  <item id="5" msg="you already like"></item>
+  <item id="6" msg="json format invalid"></item>
 </root>
