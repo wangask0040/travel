@@ -60,7 +60,7 @@ namespace server
             }
 
             var s = reader.ReadToEnd();
-            Console.WriteLine("recv:{0},lenght:{1}", s, req.ContentLength64);
+            Console.WriteLine("recv:{0},lenght:{1},time:{2}", s, req.ContentLength64, DateTime.Now);
             body.Close();
             reader.Close();
             return s;
@@ -89,7 +89,7 @@ namespace server
                     PostHandle(req, rsp);
                     break;
                 case "GET":
-                    Console.WriteLine("recv:{0}", req.Url);
+                    Console.WriteLine("recv:{0},time:{1}", req.Url, DateTime.Now);
                     GetHandle(req, rsp);
                     break;
             }
