@@ -74,6 +74,7 @@
     <Compile Include="Register.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Storage.cs" />
+    <Compile Include="Timer.cs" />
     <Compile Include="Weather.cs" />
   </ItemGroup>
   <ItemGroup>

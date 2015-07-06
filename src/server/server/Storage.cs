@@ -28,7 +28,7 @@ namespace server
                 if (f.Count == 1)
                 {
                     r._id = f[0]["_id"].ToString();
-                    r.Time = f[0]["Time"].ToUniversalTime();
+                    r.Time = Timer.DateTimeToTimeStamp(f[0]["Time"].ToLocalTime());
                     r.Ret = (int)Result.ResultCode.RcOk;
                 }
                 else

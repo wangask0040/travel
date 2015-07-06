@@ -26,9 +26,7 @@ namespace server
             Content = info.Content;
 
             Path = info.Photo.Path;
-            CreateTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
-            var s = new TimeSpan(info.Photo.CreateTime * 10000000);
-            CreateTime += s;
+            CreateTime = Timer.TimeStampToDateTime(info.Photo.CreateTime);
 
             AccountId = info.AccountId;
             Address = info.Address;

@@ -55,7 +55,7 @@ namespace server
     class SendWeiboRsp : Result
     {
         public string _id { get; set; }
-        public DateTime Time { get; set; }
+        public long Time { get; set; }
     }
 
     class LocationQueryReq
@@ -88,10 +88,7 @@ namespace server
             AccountId = info.AccountId;
             Address = info.Address;
             Weather = info.Weather;
-            DateTime d = new DateTime();
-            d = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
-            TimeSpan s = info.Time - d;
-            Time = Convert.ToInt64(s.TotalSeconds);
+            Time = Timer.DateTimeToTimeStamp(info.Time);
         }
     }
 
