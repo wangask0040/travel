@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
 
 namespace server
 {
@@ -66,9 +67,37 @@ namespace server
         public uint AccountId { get; set; }
     }
 
+    class WeiboQueryInfo
+    {
+        public ObjectId _id { get; set; }
+        public int LikeCount { get; set; }
+        public int CommentCount { get; set; }
+        public string Content { get; set; }
+        public string Path { get; set; }
+        public uint AccountId { get; set; }
+        public string Address { get; set; }
+        public string Weather { get; set; }
+        public long Time { get; set; }
+        public WeiboQueryInfo(WeiboInfoTotal info)
+        {
+            _id = info._id;
+            LikeCount = info.LikeCount;
+            CommentCount = info.CommentCount;
+            Content = info.Content;
+            Path = info.Path;
+            AccountId = info.AccountId;
+            Address = info.Address;
+            Weather = info.Weather;
+            DateTime d = new DateTime();
+            d = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            TimeSpan s = info.Time - d;
+            Time = Convert.ToInt64(s.TotalSeconds);
+        }
+    }
+
     class LocationQueryRsp : Result
     {
-        public List<WeiboInfoTotal> Info = new List<WeiboInfoTotal>();
+        public List<WeiboQueryInfo> Info = new List<WeiboQueryInfo>();
     }
 
     class FollowReq

@@ -168,11 +168,14 @@ namespace server
                                                 {
                                                     doc.ReadCount++;
                                                 }
-                                                r.Info.Add(doc);
+
+                                                var tmp = new WeiboQueryInfo(doc);
+                                                r.Info.Add(tmp);
                                             }
                                             else
                                             {
-                                                r.Info.Add(doc);
+                                                var tmp = new WeiboQueryInfo(doc);
+                                                r.Info.Add(tmp);
                                             }
                                         }
                                         break;
@@ -212,30 +215,32 @@ namespace server
                 var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Skip(skip).Limit(limit)
                     .Sort(sort).ToListAsync();
 
-                foreach (var document in f)
+                foreach (var doc in f)
                 {
                     //浏览次数加1
-                    var readFilter = Builders<ReadInfo>.Filter.Eq("_id", document._id);
+                    var readFilter = Builders<ReadInfo>.Filter.Eq("_id", doc._id);
                     var readUpate = Builders<ReadInfo>.Update.AddToSet("AccountId", info.AccountId);
                     var readOpt = new UpdateOptions { IsUpsert = true };
                     var re = CollectionMgr.Instance.ReadInfo.UpdateOneAsync(readFilter, readUpate, readOpt);
                     await re;
                     if (re.Result.ModifiedCount == 1)
                     {
-                        var readAddFilter = Builders<WeiboInfoTotal>.Filter.Eq("_id", document._id);
+                        var readAddFilter = Builders<WeiboInfoTotal>.Filter.Eq("_id", doc._id);
                         var readAddUpdate = Builders<WeiboInfoTotal>.Update.Inc("ReadCount", 1);
                         var readd = CollectionMgr.Instance.WeiboTotal.UpdateOneAsync(readAddFilter, readAddUpdate);
                         await readd;
 
                         if (readd.Result.ModifiedCount == 1)
                         {
-                            document.ReadCount++;
+                            doc.ReadCount++;
                         }
-                        r.Info.Add(document);
+                        var tmp = new WeiboQueryInfo(doc);
+                        r.Info.Add(tmp);
                     }
                     else
                     {
-                        r.Info.Add(document);
+                        var tmp = new WeiboQueryInfo(doc);
+                        r.Info.Add(tmp);
                     }
                 }
 
