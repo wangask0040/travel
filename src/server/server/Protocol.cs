@@ -128,9 +128,22 @@ namespace server
         public int Skip { get; set; }
     }
 
+    class CommentQueryUnit
+    {
+        public uint AccountId { get; set; }
+        public string Content { get; set; }
+        public long Time { get; set; }
+        public void Fill(CommentUnit cu)
+        {
+            AccountId = cu.AccountId;
+            Content = cu.Content;
+            Time = Timer.DateTimeToTimeStamp(cu.Time);
+        }
+    }
+
     class CommentQueryRsp : Result
     {
-        public List<CommentUnit> Info = new List<CommentUnit>();
+        public List<CommentQueryUnit> Info = new List<CommentQueryUnit>();
     }
 
     class CountQueryReq

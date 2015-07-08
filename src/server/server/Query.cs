@@ -93,38 +93,28 @@ namespace server
         private async void QueryComment(HttpListenerResponse rsp, CommentQueryReq info)
         {
             var r = new CommentQueryRsp();
-
-            var filter = Builders<CommentInfo>.Filter.Eq("_id", new ObjectId(info._id));
-            var opt = new FindOptions<CommentInfo>
-            {
-                Projection = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.Skip * NotLimit), NotLimit)
-            };
-            var f = CollectionMgr.Instance.CommentInfo.FindAsync(filter, opt);
-
             try
             {
-                using (var cursor = await f)
-                {
-                    while (await cursor.MoveNextAsync())
-                    {
-                        var batch = cursor.Current;
-                        foreach (var document in batch)
-                        {
-                            foreach (var arr in document.ContentArray)
-                            {
-                                r.Info.Add(arr);
-                            }
+                var obj = new ObjectId(info._id);
+                var filter = Builders<CommentInfo>.Filter.Eq("_id", obj);
+                var proj = Builders<CommentInfo>.Projection.Slice("ContentArray", (info.Skip * NotLimit), NotLimit);
+                var p = await CollectionMgr.Instance.CommentInfo.Find(filter).Limit(1).Project<CommentInfo>(proj).ToListAsync();
 
-                            r.Ret = (int)Result.ResultCode.RcOk;
-                            break;
-                        }
-                        break;
+                foreach(var o in p)
+                {
+                    foreach(var c in o.ContentArray)
+                    {
+                        var qu = new CommentQueryUnit();
+                        qu.Fill(c);
+                        r.Info.Add(qu);
                     }
+                    break;
                 }
+                r.Ret = (int)Result.ResultCode.RcOk;
             }
-            catch
+            catch(Exception e)
             {
-                r.Ret = (int)Result.ResultCode.RcFailed;
+                r.ProcException(e);
             }
 
             var json = JsonConvert.SerializeObject(r);
@@ -415,7 +405,7 @@ namespace server
 
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 r.ProcException(e);
             }
