@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Newtonsoft.Json;
 
 namespace server
 {
@@ -12,15 +13,21 @@ namespace server
         public string Msg { get; private set; }
         public void ProcException(Exception e)
         {
-            var tmp = e as ArgumentOutOfRangeException;
-            if (tmp != null)
+            var e1 = e as ArgumentOutOfRangeException;
+            if (e1 != null)
             {
                 Ret = (int)ResultCode.RcObjecidStrErr;
+                return;
             }
-            else
+            var e2 = e as JsonReaderException;
+            if (e2 != null)
             {
-                Ret = (int)ResultCode.RcFailed;
+                Ret = (int)ResultCode.RcJsonFormatErr;
+                return;
             }
+
+            Ret = (int)ResultCode.RcFailed;
+
         }
 
         public enum ResultCode

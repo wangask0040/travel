@@ -102,10 +102,10 @@ namespace server
                 t = JsonConvert.DeserializeObject<T>(s);
                 return true;
             }
-            catch
+            catch(Exception e)
             {
                 var r = new Result();
-                r.Ret = (int)Result.ResultCode.RcJsonFormatErr;
+                r.ProcException(e);
                 string str = JsonConvert.SerializeObject(r);
                 Response(rsp, str);
                 return false;
