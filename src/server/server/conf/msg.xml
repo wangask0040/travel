@@ -7,4 +7,5 @@
   <item id="4" msg="account not exists"></item>
   <item id="5" msg="you already like"></item>
   <item id="6" msg="json format invalid"></item>
+  <item id="7" msg="id str format err, must be 12 byte long"></item>
 </root>

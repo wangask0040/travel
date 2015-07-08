@@ -14,7 +14,7 @@ namespace server
         private const int Limit = 3;
         private const int NotLimit = 5;
         private const int Page = 5;
-        private const double Raduis = 1.0f; //英里 = 1.609344千米(km)
+        private const double Raduis = 0.2485484768949336f; //英里 = 1.609344千米(km)，现在是400米半径
 
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
@@ -28,12 +28,12 @@ namespace server
                             QueryLocation(rsp, info);
                     }
                     break;
-                case "/location2":
+                case "/locationCenter":
                     {
                         var s = GetBody(req);
                         var info = new LocationQuery2Req();
                         if (GetBodyJson<LocationQuery2Req>(s, ref info, rsp))
-                            QueryLocation2(rsp, info);
+                            QueryLocationCenter(rsp, info);
                     }
                     break;
                 case "/count":
@@ -380,7 +380,7 @@ namespace server
             Response(rsp, json);
         }
 
-        private async void QueryLocation2(HttpListenerResponse rsp, LocationQuery2Req info)
+        private async void QueryLocationCenter(HttpListenerResponse rsp, LocationQuery2Req info)
         {
             var filter = Builders<WeiboInfoTotal>.Filter.GeoWithinCenter("Coordinates", info.Longi, info.Lati, Raduis);
             var sort = Builders<WeiboInfoTotal>.Sort.Descending("Time");
@@ -395,12 +395,17 @@ namespace server
             try
             {
                 var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Sort(sort).Limit(Page).ToListAsync();
+                var obj = new ObjectId();
+                if (info._id != null && info._id.Length > 0)
+                {
+                    obj = new ObjectId(info._id);
+                }
 
                 foreach (var doc in f)
                 {
                     if (info._id != null && info._id.Length > 0)
                     {
-                        if (doc._id == new ObjectId(info._id))
+                        if (doc._id == obj)
                             continue;
                     }
 
@@ -410,9 +415,9 @@ namespace server
 
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
-            catch
+            catch(Exception e)
             {
-                r.Ret = (int)Result.ResultCode.RcFailed;
+                r.ProcException(e);
             }
 
             var json = JsonConvert.SerializeObject(r);

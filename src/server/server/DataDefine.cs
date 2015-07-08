@@ -51,8 +51,7 @@ namespace server
             AccountId = info.AccountId;
             Content = info.Content;
             Time = new DateTime();
-            var ts = new TimeSpan(8, 0, 0);
-            Time = DateTime.Now + ts;
+            Time = DateTime.Now;
         }
     }
 

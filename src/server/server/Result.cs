@@ -10,6 +10,18 @@ namespace server
 
         public int Ret { get { return _result; } set { _result = value; Msg = ResultMsg.Instance.Msg(value); } }
         public string Msg { get; private set; }
+        public void ProcException(Exception e)
+        {
+            var tmp = e as ArgumentOutOfRangeException;
+            if (tmp != null)
+            {
+                Ret = (int)ResultCode.RcObjecidStrErr;
+            }
+            else
+            {
+                Ret = (int)ResultCode.RcFailed;
+            }
+        }
 
         public enum ResultCode
         {
@@ -20,6 +32,7 @@ namespace server
             RcAccountNotExists = 4,
             RcAlreayLike = 5,
             RcJsonFormatErr = 6,
+            RcObjecidStrErr = 7,
         }
     }
 

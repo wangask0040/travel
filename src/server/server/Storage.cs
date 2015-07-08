@@ -6,8 +6,6 @@ using System.Net;
 
 namespace server
 {
-
-
     class Storage : HttpSvrBase
     {
         public async void SaveWeibo(HttpListenerRequest req, HttpListenerResponse rsp, WeiboInfo info)
@@ -50,25 +48,32 @@ namespace server
             var r = new Result();
 
             //将账号id加入到赞db的数组
-            var objid = new ObjectId(info._id);
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", objid);
-            var update = Builders<BsonDocument>.Update.AddToSet("AccountId", info.AccountId);
-            var uop = new UpdateOptions { IsUpsert = true };
-
-            var u = CollectionMgr.Instance.LikeBson.UpdateOneAsync(filter, update, uop);
-            await u;
-
-            if (u.Result.ModifiedCount == 1)
+            try
             {
-                var wfilter = Builders<BsonDocument>.Filter.Eq("_id", objid);
-                var wupdate = Builders<BsonDocument>.Update.Inc("LikeCount", 1);
-                var w = CollectionMgr.Instance.WeiboBson.UpdateOneAsync(wfilter, wupdate);
-                await w;
-                r.Ret = (int)Result.ResultCode.RcOk;
+                var objid = new ObjectId(info._id);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", objid);
+                var update = Builders<BsonDocument>.Update.AddToSet("AccountId", info.AccountId);
+                var uop = new UpdateOptions { IsUpsert = true };
+
+                var u = CollectionMgr.Instance.LikeBson.UpdateOneAsync(filter, update, uop);
+                await u;
+
+                if (u.Result.ModifiedCount == 1)
+                {
+                    var wfilter = Builders<BsonDocument>.Filter.Eq("_id", objid);
+                    var wupdate = Builders<BsonDocument>.Update.Inc("LikeCount", 1);
+                    var w = CollectionMgr.Instance.WeiboBson.UpdateOneAsync(wfilter, wupdate);
+                    await w;
+                    r.Ret = (int)Result.ResultCode.RcOk;
+                }
+                else
+                {
+                    r.Ret = (int)Result.ResultCode.RcAlreayLike;
+                }
             }
-            else
+            catch(Exception e)
             {
-                r.Ret = (int)Result.ResultCode.RcAlreayLike;
+                r.ProcException(e);
             }
             var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
@@ -80,11 +85,11 @@ namespace server
 
             try
             {
-                var objid = new ObjectId(info._id);
+                var obj = new ObjectId(info._id);
                 var unit = new CommentUnit();
                 unit.FillData(info);
 
-                var pfilter = Builders<BsonDocument>.Filter.Eq("_id", objid);
+                var pfilter = Builders<BsonDocument>.Filter.Eq("_id", obj);
                 var pup = Builders<BsonDocument>.Update.Push("ContentArray", unit);
                 var popt = new UpdateOptions { IsUpsert = true };
 
@@ -92,16 +97,16 @@ namespace server
                 await p;
 
                 //更新评论数
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", objid);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", obj);
                 var up = Builders<BsonDocument>.Update.Inc("CommentCount", 1);
                 var u = CollectionMgr.Instance.WeiboBson.UpdateOneAsync(filter, up);
                 await u;
 
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
-            catch
+            catch(Exception e)
             {
-                r.Ret = (int)Result.ResultCode.RcFailed;
+                r.ProcException(e);
             }
             var json = JsonConvert.SerializeObject(r);
             Response(rsp, json);
@@ -163,7 +168,6 @@ namespace server
             }
             catch
             {
-
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
