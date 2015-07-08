@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Net;
+using System;
 
 namespace server
 {
@@ -12,6 +13,8 @@ namespace server
     {
         private const int Limit = 3;
         private const int NotLimit = 5;
+        private const int Page = 5;
+        private const double Raduis = 1.0f; //英里 = 1.609344千米(km)
 
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
@@ -23,6 +26,14 @@ namespace server
                         var info = new LocationQueryReq();
                         if (GetBodyJson<LocationQueryReq>(s, ref info, rsp))
                             QueryLocation(rsp, info);
+                    }
+                    break;
+                case "/location2":
+                    {
+                        var s = GetBody(req);
+                        var info = new LocationQuery2Req();
+                        if (GetBodyJson<LocationQuery2Req>(s, ref info, rsp))
+                            QueryLocation2(rsp, info);
                     }
                     break;
                 case "/count":
@@ -212,8 +223,8 @@ namespace server
 
             try
             {
-                var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Skip(skip).Limit(limit)
-                    .Sort(sort).ToListAsync();
+                var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Sort(sort).Skip(skip)
+                    .Limit(limit).ToListAsync();
 
                 foreach (var doc in f)
                 {
@@ -358,6 +369,45 @@ namespace server
 
                     r.IconList.Add(icon);
                 }
+                r.Ret = (int)Result.ResultCode.RcOk;
+            }
+            catch
+            {
+                r.Ret = (int)Result.ResultCode.RcFailed;
+            }
+
+            var json = JsonConvert.SerializeObject(r);
+            Response(rsp, json);
+        }
+
+        private async void QueryLocation2(HttpListenerResponse rsp, LocationQuery2Req info)
+        {
+            var filter = Builders<WeiboInfoTotal>.Filter.GeoWithinCenter("Coordinates", info.Longi, info.Lati, Raduis);
+            var sort = Builders<WeiboInfoTotal>.Sort.Descending("Time");
+            var r = new LocationQueryRsp();
+
+            if (info.Time > 0)
+            {
+                DateTime Time = Timer.TimeStampToDateTime(info.Time);
+                filter &= Builders<WeiboInfoTotal>.Filter.Lte("Time", info.Time);
+            }
+
+            try
+            {
+                var f = await CollectionMgr.Instance.WeiboTotal.Find(filter).Sort(sort).Limit(Page).ToListAsync();
+
+                foreach (var doc in f)
+                {
+                    if (info._id != null && info._id.Length > 0)
+                    {
+                        if (doc._id == new ObjectId(info._id))
+                            continue;
+                    }
+
+                    var tmp = new WeiboQueryInfo(doc);
+                    r.Info.Add(tmp);
+                }
+
                 r.Ret = (int)Result.ResultCode.RcOk;
             }
             catch

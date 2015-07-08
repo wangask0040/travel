@@ -67,6 +67,15 @@ namespace server
         public uint AccountId { get; set; }
     }
 
+    class LocationQuery2Req
+    {
+        public double Longi { get; set; }
+        public double Lati { get; set; }
+        public string _id { get; set; }
+        public long Time { get; set; }
+        public uint AccountId { get; set; }
+    }
+    
     class WeiboQueryInfo
     {
         public ObjectId _id { get; set; }
