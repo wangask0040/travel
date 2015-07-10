@@ -52,15 +52,15 @@ namespace server
         {
             var body = req.InputStream;
             var encoding = req.ContentEncoding;
-            //var reader = new System.IO.StreamReader(body, encoding);
-            var reader = new System.IO.StreamReader(body);
-            if (req.ContentType != null)
-            {
-                Console.WriteLine("Client data content type {0}", req.ContentType);
-            }
+            var reader = new System.IO.StreamReader(body, encoding);
+
+            Console.WriteLine("content type:{0},encoding:{1},lenght:{2},time:{3}",
+                    req.ContentType != null ? req.ContentType : "null", encoding.BodyName, 
+                    req.ContentLength64, DateTime.Now);
 
             var s = reader.ReadToEnd();
-            Console.WriteLine("recv:{0},lenght:{1},time:{2}", s, req.ContentLength64, DateTime.Now);
+            Console.WriteLine("recv:{0}", s);
+
             body.Close();
             reader.Close();
             return s;
@@ -70,7 +70,7 @@ namespace server
         {
             try
             {
-                rsp.ContentType = "application/json";
+                rsp.ContentType = "application/json;charset=gb2312";
                 var buf = Encoding.Default.GetBytes(str);
                 rsp.OutputStream.Write(buf, 0, buf.Length);
                 rsp.OutputStream.Close();

@@ -8,7 +8,6 @@ namespace server
     class Result
     {
         private int _result;
-
         public int Ret { get { return _result; } set { _result = value; Msg = ResultMsg.Instance.Msg(value); } }
         public string Msg { get; private set; }
         public void ProcException(Exception e)
