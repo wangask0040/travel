@@ -28,11 +28,11 @@ namespace server
             var req = cxt.Request;
             var rsp = cxt.Response;
 
-//             if (!req.HasEntityBody)
-//             {
-//                 Console.WriteLine("No client data was sent with the request.");
-//                 return;
-//             }
+            //             if (!req.HasEntityBody)
+            //             {
+            //                 Console.WriteLine("No client data was sent with the request.");
+            //                 return;
+            //             }
 
             RouteMethod(req, rsp);
         }
@@ -52,8 +52,8 @@ namespace server
         {
             var body = req.InputStream;
             var encoding = req.ContentEncoding;
-            var reader = new System.IO.StreamReader(body, encoding);
-
+            //var reader = new System.IO.StreamReader(body, encoding);
+            var reader = new System.IO.StreamReader(body);
             if (req.ContentType != null)
             {
                 Console.WriteLine("Client data content type {0}", req.ContentType);
@@ -83,7 +83,7 @@ namespace server
 
         protected void RouteMethod(HttpListenerRequest req, HttpListenerResponse rsp)
         {
-            switch(req.HttpMethod)
+            switch (req.HttpMethod)
             {
                 case "POST":
                     PostHandle(req, rsp);
@@ -97,12 +97,12 @@ namespace server
 
         protected bool GetBodyJson<T>(string s, ref T t, HttpListenerResponse rsp)
         {
-            try 
+            try
             {
                 t = JsonConvert.DeserializeObject<T>(s);
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var r = new Result();
                 r.ProcException(e);
