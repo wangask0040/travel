@@ -112,9 +112,7 @@ namespace server
                 r.Ret = ret;
             }
 
-            //回包
-            var str = JsonConvert.SerializeObject(r);
-            Response(rsp, str);
+            Response(rsp, r);
         }
     }
 }

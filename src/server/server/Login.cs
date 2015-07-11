@@ -56,8 +56,7 @@ namespace server
                 }
             }
 
-            var str = JsonConvert.SerializeObject(r);
-            Response(rsp, str);
+            Response(rsp, r);
         }
     }
 }

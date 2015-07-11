@@ -39,8 +39,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void LikeWeibo(HttpListenerResponse rsp, LikeWeiboReq info)
@@ -75,8 +74,8 @@ namespace server
             {
                 r.ProcException(e);
             }
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            
+            Response(rsp, r);
         }
 
         private async void CommentWeibo(HttpListenerResponse rsp, CommentWeiboReq info)
@@ -108,8 +107,8 @@ namespace server
             {
                 r.ProcException(e);
             }
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            
+            Response(rsp, r);
         }
 
         private async void Follow(HttpListenerResponse rsp, FollowReq info)
@@ -136,8 +135,8 @@ namespace server
             {
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            
+            Response(rsp, r);
         }
 
         private async void SetIcon(HttpListenerResponse rsp, SetUserIconReq info)
@@ -171,8 +170,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)

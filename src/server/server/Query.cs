@@ -117,8 +117,7 @@ namespace server
                 r.ProcException(e);
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void QueryFriend(HttpListenerResponse rsp, FriendQueryReq info)
@@ -198,8 +197,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void QueryLocation(HttpListenerResponse rsp, LocationQueryReq info)
@@ -252,8 +250,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void QueryCount(HttpListenerResponse rsp, CountQueryReq info)
@@ -275,8 +272,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void QueryLike(HttpListenerResponse rsp, LikeQueryReq info)
@@ -312,8 +308,8 @@ namespace server
             {
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            
+            Response(rsp, r);
         }
 
         private async void GetSign(HttpListenerResponse rsp, GetSignReq info)
@@ -334,8 +330,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcAccountNotExists;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void QueryUserIcon(HttpListenerResponse rsp, GetUserIconReq info)
@@ -366,8 +361,7 @@ namespace server
                 r.Ret = (int)Result.ResultCode.RcFailed;
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
 
         private async void QueryLocationCenter(HttpListenerResponse rsp, LocationQuery2Req info)
@@ -410,8 +404,7 @@ namespace server
                 r.ProcException(e);
             }
 
-            var json = JsonConvert.SerializeObject(r);
-            Response(rsp, json);
+            Response(rsp, r);
         }
     }
 }

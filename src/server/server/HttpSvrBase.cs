@@ -66,10 +66,11 @@ namespace server
             return s;
         }
 
-        public void Response(HttpListenerResponse rsp, string str)
+        public void Response(HttpListenerResponse rsp, Result r)
         {
             try
             {
+                string str = JsonConvert.SerializeObject(r);
                 rsp.ContentType = "application/json;charset=gb2312";
                 var buf = Encoding.Default.GetBytes(str);
                 rsp.OutputStream.Write(buf, 0, buf.Length);
@@ -106,8 +107,7 @@ namespace server
             {
                 var r = new Result();
                 r.ProcException(e);
-                string str = JsonConvert.SerializeObject(r);
-                Response(rsp, str);
+                Response(rsp, r);
                 return false;
             }
         }
