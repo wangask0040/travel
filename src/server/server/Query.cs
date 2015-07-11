@@ -18,11 +18,11 @@ namespace server
 
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
+            var s = GetBody(req);
             switch (req.Url.AbsolutePath)
             {
                 case "/location":
                     {
-                        var s = GetBody(req);
                         var info = new LocationQueryReq();
                         if (GetBodyJson<LocationQueryReq>(s, ref info, rsp))
                             QueryLocation(rsp, info);
@@ -30,7 +30,6 @@ namespace server
                     break;
                 case "/locationCenter":
                     {
-                        var s = GetBody(req);
                         var info = new LocationQuery2Req();
                         if (GetBodyJson<LocationQuery2Req>(s, ref info, rsp))
                             QueryLocationCenter(rsp, info);
@@ -38,7 +37,6 @@ namespace server
                     break;
                 case "/count":
                     {
-                        var s = GetBody(req);
                         var info = new CountQueryReq();
                         if (GetBodyJson<CountQueryReq>(s, ref info, rsp))
                             QueryCount(rsp, info);
@@ -46,7 +44,6 @@ namespace server
                     break;
                 case "/friend":
                     {
-                        var s = GetBody(req);
                         var info = new FriendQueryReq();
                         if (GetBodyJson<FriendQueryReq>(s, ref info, rsp))
                             QueryFriend(rsp, info);
@@ -54,7 +51,6 @@ namespace server
                     break;
                 case "/comment":
                     {
-                        var s = GetBody(req);
                         var info = new CommentQueryReq();
                         if (GetBodyJson<CommentQueryReq>(s, ref info, rsp))
                             QueryComment(rsp, info);
@@ -62,7 +58,6 @@ namespace server
                     break;
                 case "/like":
                     {
-                        var s = GetBody(req);
                         var info = new LikeQueryReq();
                         if (GetBodyJson<LikeQueryReq>(s, ref info, rsp))
                             QueryLike(rsp, info);
@@ -70,7 +65,6 @@ namespace server
                     break;
                 case "/getsign":
                     {
-                        var s = GetBody(req);
                         var info = new GetSignReq();
                         if (GetBodyJson<GetSignReq>(s, ref info, rsp))
                             GetSign(rsp, info);
@@ -78,7 +72,6 @@ namespace server
                     break;
                 case "/usericon":
                     {
-                        var s = GetBody(req);
                         var info = new GetUserIconReq();
                         if (GetBodyJson<GetUserIconReq>(s, ref info, rsp))
                             QueryUserIcon(rsp, info);

@@ -87,7 +87,8 @@ namespace server
             switch (req.HttpMethod)
             {
                 case "POST":
-                    PostHandle(req, rsp);
+                    if (req.HasEntityBody)
+                        PostHandle(req, rsp);
                     break;
                 case "GET":
                     Console.WriteLine("recv:{0},time:{1}", req.Url, DateTime.Now);

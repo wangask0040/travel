@@ -175,11 +175,11 @@ namespace server
 
         public override void PostHandle(HttpListenerRequest req, HttpListenerResponse rsp)
         {
+            var s = GetBody(req);
             switch (req.Url.AbsolutePath)
             {
                 case "/sendwb":
                     {
-                        var s = GetBody(req);
                         var info = new SendWeiboReq();
                         if (GetBodyJson<SendWeiboReq>(s, ref info, rsp))
                         {
@@ -191,7 +191,6 @@ namespace server
                     break;
                 case "/likewb":
                     {
-                        var s = GetBody(req);
                         var info = new LikeWeiboReq();
                         if (GetBodyJson<LikeWeiboReq>(s, ref info, rsp))
                             LikeWeibo(rsp, info);
@@ -199,7 +198,6 @@ namespace server
                     break;
                 case "/commentswb":
                     {
-                        var s = GetBody(req);
                         var info = new CommentWeiboReq();
                         if (GetBodyJson<CommentWeiboReq>(s, ref info, rsp))
                             CommentWeibo(rsp, info);
@@ -207,7 +205,6 @@ namespace server
                     break;
                 case "/follow":
                     {
-                        var s = GetBody(req);
                         var info = new FollowReq();
                         if (GetBodyJson<FollowReq>(s, ref info, rsp))
                             Follow(rsp, info);
@@ -215,7 +212,6 @@ namespace server
                     break;
                 case "/seticon":
                     {
-                        var s = GetBody(req);
                         var info = new SetUserIconReq();
                         if (GetBodyJson<SetUserIconReq>(s, ref info, rsp))
                             SetIcon(rsp, info);
